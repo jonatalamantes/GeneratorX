@@ -26,8 +26,8 @@ import java.util.LinkedList;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
 
-public class VentanaPrincipal {
-
+public class VentanaPrincipal 
+{
 	private JFrame frame;
 	private JTextField txtAgregarClase;
 	private JTextField txtAgregarAtributo;
@@ -53,13 +53,19 @@ public class VentanaPrincipal {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
+	public static void main(String[] args) 
+	{
+		EventQueue.invokeLater(new Runnable() 
+		{
+			public void run() 
+			{
+				try 
+				{
 					VentanaPrincipal window = new VentanaPrincipal();
 					window.frame.setVisible(true);
-				} catch (Exception e) {
+				} 
+				catch (Exception e) 
+				{
 					e.printStackTrace();
 				}
 			}
@@ -102,7 +108,8 @@ public class VentanaPrincipal {
 	/**
 	 * Create the application.
 	 */
-	public VentanaPrincipal() {
+	public VentanaPrincipal() 
+	{
 		initialize();
 	}
 
