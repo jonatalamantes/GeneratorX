@@ -34,7 +34,7 @@ public class VentanaPrincipal
 	private JTextField txtAgregarClase;
 	private JTextField txtAgregarAtributo;
 	private JList<String> listaClases;
-	private JList<String> listaAtributos;
+	private JList<String> listaAtributos; 
 	private JFileChooser chooser = new JFileChooser();
 
 	private LinkedList<Clase> clases;
