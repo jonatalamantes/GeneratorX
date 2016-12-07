@@ -8,11 +8,13 @@ import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.Color;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -33,7 +35,8 @@ public class VentanaPrincipal
 	private JTextField txtAgregarAtributo;
 	private JList<String> listaClases;
 	private JList<String> listaAtributos;
-	
+	private JFileChooser chooser = new JFileChooser();
+
 	private LinkedList<Clase> clases;
 	private JPanel panelClase;
 	private JPanel panelAtributo;
@@ -225,7 +228,18 @@ public class VentanaPrincipal
 					if (pos == -1)
 					{
 						txtAgregarClase.setText("");
+						
+						if (clases.isEmpty())
+						{
+							claseTemp.setId(1);
+						}
+						else
+						{
+							claseTemp.setId(clases.getLast().getId()+1);
+						}
+
 						clases.add(claseTemp);
+
 						actualizar();
 					}
 				}
@@ -391,8 +405,18 @@ public class VentanaPrincipal
 						}
 						
 						if (pos == -1)
-						{
+						{							
+							if (miClase.getAtributos().isEmpty())
+							{
+								atributoTemp.setId(1);
+							}
+							else
+							{
+								atributoTemp.setId(miClase.getAtributos().getLast().getId()+1);
+							}
+							
 							miClase.getAtributos().add(atributoTemp);
+
 							txtAgregarAtributo.setText("");
 							actualizar();
 						}
@@ -544,12 +568,80 @@ public class VentanaPrincipal
 		menuBar.add(mnArchivo);
 
 		JMenuItem mntmNuevo = new JMenuItem("Nuevo");
+		mntmNuevo.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseReleased(MouseEvent e) 
+			{
+				clases = new LinkedList<Clase>();
+				claseActual = -1;
+				atributoActual = -1;
+				actualizar();
+				panelClase.setVisible(false);
+			}
+		});
 		mnArchivo.add(mntmNuevo);
 		
 		JMenuItem mntmLeer = new JMenuItem("Leer");
+		mntmLeer.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseReleased(MouseEvent e) 
+			{
+				//Creamos la estructura para abrir archivos
+				 FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos GX", "gx");
+				 chooser.setCurrentDirectory(new java.io.File("."));
+				 chooser.setDialogTitle("Leer GX");
+				 chooser.setApproveButtonText("Leer");
+				 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				 chooser.setFileFilter(filter);
+				 
+				 if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) 
+				 {					 
+					 //Leemos el archivo csv					 
+					 if (chooser.getSelectedFile().getAbsolutePath().endsWith(".gx"))
+					 {
+						 clases = ManejadorArchivos.importar(chooser.getSelectedFile().getAbsolutePath());
+						 claseActual = -1;
+						 atributoActual = -1;
+						 actualizar();
+						 panelClase.setVisible(false);						 
+					 }
+				 } 
+			}
+		});
 		mnArchivo.add(mntmLeer);
 				
 		JMenuItem mntmGuardar = new JMenuItem("Guardar");
+		mntmGuardar.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseReleased(MouseEvent e) 
+			{
+				if (clases != null && !clases.isEmpty())
+				{
+					chooser.setCurrentDirectory(new java.io.File("."));
+					chooser.setDialogTitle("Guardar GX");
+					chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					chooser.setApproveButtonText("Guardar");
+					 
+					if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) 
+					{				 				
+						 String archivo = chooser.getSelectedFile().getAbsolutePath();
+						 					 
+						 if (!archivo.endsWith(".gx"))
+						 {
+							 archivo += ".gx";
+						 }
+						 
+						 if (archivo.endsWith(".gx"))
+						 {
+							 ManejadorArchivos.exportar(archivo, clases);
+						 }						 
+					}
+				}
+			}
+		});
 		mnArchivo.add(mntmGuardar);
 		
 		JMenuItem mntmExportarPhp = new JMenuItem("Exportar PHP");
