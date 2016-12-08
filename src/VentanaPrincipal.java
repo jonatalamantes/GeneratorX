@@ -645,6 +645,18 @@ public class VentanaPrincipal
 		mnArchivo.add(mntmGuardar);
 		
 		JMenuItem mntmExportarPhp = new JMenuItem("Exportar PHP");
+		mntmExportarPhp.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mouseReleased(MouseEvent e) 
+			{
+				for (int i = 0; i < clases.size(); i++)
+				{
+					ExportadorPHP.exportarClase(clases.get(i));
+					ExportadorPHP.exportarControlador(clases.get(i));
+				}
+			}
+		});
 		mnArchivo.add(mntmExportarPhp);
 	}
 }

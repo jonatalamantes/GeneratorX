@@ -1,1 +1,1 @@
-1*alumno*1|id|0|||1|0|0|0|&2|nombres|1|||0|0|0|0|&3|apellido_paterno|1|||0|0|0|0|&4|apellido_materno|1|||0|0|0|0|&5|password|1|||0|0|0|0|&6|activo|4|'S','N'|'S'|0|0|0|0|&7|fecha_registro|2|||0|0|0|0|&*0*$
+1*alumno*1|id|0|||1|0|0|0|&2|nombres|1|||0|0|0|1|&3|apellido_paterno|1|||0|0|0|1|&4|apellido_materno|1|||0|0|0|1|&5|password|1|||0|0|0|1|&6|activo|4|'S','N'|'S'|0|0|0|0|&7|fecha_registro|2|||0|0|0|0|&8|tipo|4|'admin', 'normal'||0|0|0|1|&*0*$
