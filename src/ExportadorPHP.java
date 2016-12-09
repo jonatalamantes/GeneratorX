@@ -257,7 +257,7 @@ public class ExportadorPHP
 			imprimir("/**", writer, espacioTabulador);
 			imprimir(" * Calculo para saber que tan diferente es un objeto de otro", writer, espacioTabulador);
 			imprimir(" * ", writer, espacioTabulador);
-			imprimir(" * @param  Alumno $obj [Objeto con el que se comparara]", writer, espacioTabulador);
+			imprimir(" * @param  " + nombreClase + " $obj [Objeto con el que se comparara]", writer, espacioTabulador);
 			imprimir(" * @return [float]     [Disimilitud entre los dos objetos]", writer, espacioTabulador);
 			imprimir(" */", writer, espacioTabulador);
 			imprimir("public function disimilitud($obj = null)", writer, espacioTabulador);
@@ -343,7 +343,7 @@ public class ExportadorPHP
 		{
 			writer = new PrintWriter(path, "UTF-8");
 
-			//Creamos la parte de arriba de la clase
+			/* Creamos la parte de arriba de la clase */
 			writer.println("<?php ");
 			writer.println();
 			espacioTabulador++;
@@ -354,11 +354,11 @@ public class ExportadorPHP
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Clase para Manipular Objetos del Tipo " + nombreClase, writer, espacioTabulador);
 		    imprimir(" */", writer, espacioTabulador);
-		    imprimir("class ControladorAlumno", writer, espacioTabulador);
+		    imprimir("class Controlador" + nombreClase + "", writer, espacioTabulador);
 		    imprimir("{", writer, espacioTabulador);
 		    espacioTabulador++;
 
-		    //Creamos el metodo de getSingle
+		    /* Creamos el metodo de getSingle */
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Recupera un objeto de tipo " + nombreClase, writer, espacioTabulador);
 		    imprimir(" */", writer, espacioTabulador);
@@ -393,9 +393,9 @@ public class ExportadorPHP
 		    imprimir("return $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+1);
 		    imprimir("}", writer, espacioTabulador);		    
 
-		    //Creamos el metodo de get All
+		    /* Creamos el metodo de getAll */
 		    imprimir("/**", writer, espacioTabulador);
-		    imprimir(" * Obtiene todos los alumnos de la tabla de alumnos", writer, espacioTabulador);
+		    imprimir(" * Obtiene todos los " + nombreClase.toLowerCase() + "s de la tabla de " + nombreClase.toLowerCase() + "s", writer, espacioTabulador);
 		    imprimir(" */", writer, espacioTabulador);
 		    imprimir("static function getAll($order = 'id', $begin = 0, $cantidad = 10)", writer, espacioTabulador);
 		    imprimir("{", writer, espacioTabulador);
@@ -407,6 +407,7 @@ public class ExportadorPHP
 		    imprimir("              ORDER BY \";", writer, espacioTabulador+1);
 	        imprimir("", writer, espacioTabulador);
 	        
+	        //Creanos los if else de los ordenamientos
 	        boolean primera = true;
 	        int posicionPrimaria = -1;
 	        for (int i = 0; i < clase.getAtributos().size(); i++)
@@ -479,6 +480,195 @@ public class ExportadorPHP
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("}", writer, espacioTabulador);
 
+	    	/* Creamos el metodo Add */
+	    	imprimir("/**", writer, espacioTabulador);
+	    	imprimir(" * Inserta un elemento en la base de datos del tipo " + nombreClase.toLowerCase() + "", writer, espacioTabulador);
+	    	imprimir(" */", writer, espacioTabulador);
+	    	imprimir("static function add($" + nombreClase.toLowerCase() + " = null)", writer, espacioTabulador);
+	    	imprimir("{", writer, espacioTabulador);
+	    	imprimir("if ($" + nombreClase.toLowerCase() + " === null)", writer, espacioTabulador+1);
+	    	imprimir("{", writer, espacioTabulador+1);
+	    	imprimir("return false;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("", writer, espacioTabulador);
+	    	imprimir("$opciones = array(", writer, espacioTabulador+1);
+	    	
+	    	//Generamos el arreglo de opciones
+	    	for (int i = 0; i < clase.getAtributos().size(); i++)
+	    	{
+	    		if (clase.getAtributos().get(i).isDisimil())
+	    		{
+		    		String nombreAtributo = clase.getAtributos().get(i).getNombre(); 
+		    		String cad = "'" + nombreAtributo + "'";
+		    		int tam = getTamEspacios(nombreAtributo, clase, false);
+		    		for (int j = 0; j < tam; j++)
+		    		{
+		    			cad += " ";
+		    		}
+		    		cad += " => $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + nombreAtributo) + "(),";
+		    		imprimir(cad, writer, espacioTabulador+2);
+	    		}	    		
+	    	}
+    		String nombreAtributo = "activo"; 
+    		String cad = "'" + nombreAtributo + "'";
+    		int tam = getTamEspacios(nombreAtributo, clase, false);
+    		for (int j = 0; j < tam; j++)
+    		{
+    			cad += " ";
+    		}
+    		cad += " => 'S'";
+    		imprimir(cad, writer, espacioTabulador+2);
+    		imprimir(");", writer, espacioTabulador+1);
+
+    		//Continuamos
+	    	imprimir("", writer, espacioTabulador);
+	    	imprimir("$single" + nombreClase + " = self::getSingle($opciones);", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("if ($single" + nombreClase + " == NULL || $single" + nombreClase + "->disimilitud($" + nombreClase.toLowerCase() + ") == 1)", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+	    	
+	    	//Generamos las variables de insercion
+	    	for (int i = 0; i < clase.getAtributos().size(); i++)
+	    	{	    		
+	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		
+	    		if (nombreAtributo.toLowerCase().equals("activo") || 
+	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+	    			clase.getAtributos().get(i).isPrimaria())
+	    		{
+	    			continue;
+	    		}
+	    		
+	    		cad = "$" + nombreAtributo;
+	    		tam = getTamEspacios(nombreAtributo, clase, false);
+	    		for (int j = 0; j < tam; j++)
+	    		{
+	    			cad += " ";
+	    		}
+	    		cad += " = $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + nombreAtributo) + "();";
+	    		imprimir(cad, writer, espacioTabulador+2);
+	    	}
+	    	
+	    	imprimir("", writer, espacioTabulador);
+	        imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+2);
+	    	imprimir("", writer, espacioTabulador);
+	    	
+	    	//Generamos la consulta
+	    	imprimir("$query   = \"INSERT INTO $table" + nombreClase + " ", writer, espacioTabulador+2);
+	    	cad = "";
+	    	int interno = -1;
+	    	for (int i = 0; i < clase.getAtributos().size(); i++)
+	    	{
+	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		
+	    		if (nombreAtributo.toLowerCase().equals("activo") || 
+		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+		    		clase.getAtributos().get(i).isPrimaria())
+	    		{
+	    			continue;
+	    		}
+	    		else
+	    		{
+	    			interno++;
+	    		}
+
+	    		if (interno == 0)
+	    		{
+	    			cad += "(";
+	    			cad += clase.getAtributos().get(i).getNombre() + ", ";
+	    		}
+	    		else if (interno % 3 == 0)
+	    		{					
+					if (i == clase.getAtributos().size()-1)
+					{
+						cad = cad.substring(0, cad.length()-2);
+						cad += ")";
+					}
+					
+					imprimir(cad, writer, espacioTabulador+5);
+					cad = "";
+					cad += clase.getAtributos().get(i).getNombre() + ", ";
+	    		}
+	    		else
+	    		{
+	    			cad += clase.getAtributos().get(i).getNombre() + ", ";
+	    		}
+	    	}
+	    	
+	    	if (!cad.equals(""))
+	    	{
+				cad = cad.substring(0, cad.length()-2);
+				cad += ")";
+				imprimir(cad, writer, espacioTabulador+5);
+				cad = "";
+	    	}
+
+			imprimir("VALUES", writer, espacioTabulador+5);
+	    	cad = "";
+	    	interno = -1;
+	    	for (int i = 0; i < clase.getAtributos().size(); i++)
+	    	{
+	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		
+	    		if (nombreAtributo.toLowerCase().equals("activo") || 
+		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+		    		clase.getAtributos().get(i).isPrimaria())	    		
+	    		{
+	    			continue;
+	    		}
+	    		else
+	    		{
+	    			interno++;
+	    		}
+
+	    		if (interno == 0)
+	    		{
+	    			cad += "(";
+	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    		}
+	    		else if (interno % 3 == 0)
+	    		{    			
+					if (i == clase.getAtributos().size()-1)
+					{
+						cad = cad.substring(0, cad.length()-2);
+						cad += ")\";";
+					}
+					
+					imprimir(cad, writer, espacioTabulador+5);
+					cad = "";
+	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    		}
+	    		else
+	    		{
+	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    		}
+	    	}
+	    	
+	    	if (!cad.equals(""))
+	    	{
+				cad = cad.substring(0, cad.length()-2);
+				cad += ")\";";
+				imprimir(cad, writer, espacioTabulador+5);
+				cad = "";
+	    	}
+	    	
+	    	//Continuamos
+	    	imprimir("", writer, espacioTabulador);
+	        imprimir("if (DatabaseManager::singleAffectedRow($query) === true)", writer, espacioTabulador+2);
+	        imprimir("{", writer, espacioTabulador+2);
+	        imprimir("return true;", writer, espacioTabulador+3);
+	        imprimir("}", writer, espacioTabulador+2);
+	        imprimir("else", writer, espacioTabulador+2);
+	        imprimir("{", writer, espacioTabulador+2);
+	        imprimir("return false;", writer, espacioTabulador+3);
+	        imprimir("}", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("else", writer, espacioTabulador+1);
+	        imprimir("{", writer, espacioTabulador+1);
+	        imprimir("return false;", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("}", writer, espacioTabulador);
+	    	
 			writer.println("?>");
 			
 			writer.close();

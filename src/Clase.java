@@ -59,4 +59,17 @@ public class Clase
 	{
 		return this.nombre;
 	}
+	
+	public AtributoClase getPrimaria()
+	{
+		for (int i = 0; i < this.getAtributos().size(); i++)
+		{
+			if (this.getAtributos().get(i).isPrimaria())
+			{
+				return this.getAtributos().get(i);
+			}
+		}
+		
+		return null;
+	}
 }
