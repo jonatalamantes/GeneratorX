@@ -41,6 +41,7 @@
         
             return $alumnoA;
         }
+        
         /**
          * Obtiene todos los alumnos de la tabla de alumnos
          */
@@ -106,7 +107,128 @@
             }
             else
             {
-                return null;
+                return NULL;
+            }
+        }
+        
+        /**
+         * Inserta un elemento en la base de datos del tipo alumno
+         */
+        static function add($alumno = null)
+        {
+            if ($alumno === null)
+            {
+                return false;
+            }
+        
+            $opciones = array(
+                'nombres'          => $alumno->getNombres(),
+                'apellido_paterno' => $alumno->getApellidoPaterno(),
+                'apellido_materno' => $alumno->getApellidoMaterno(),
+                'password'         => $alumno->getPassword(),
+                'tipo'             => $alumno->getTipo(),
+                'activo'           => 'S'
+            );
+        
+            $singleAlumno = self::getSingle($opciones);
+        
+            if ($singleAlumno == NULL || $singleAlumno->disimilitud($alumno) == 1)
+            {
+                $nombres          = $alumno->getNombres();
+                $apellido_paterno = $alumno->getApellidoPaterno();
+                $apellido_materno = $alumno->getApellidoMaterno();
+                $password         = $alumno->getPassword();
+                $tipo             = $alumno->getTipo();
+        
+                $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
+        
+                $query   = "INSERT INTO $tableAlumno 
+                            (nombres, apellido_paterno, apellido_materno, 
+                            password, tipo)
+                            VALUES
+                            ('$nombres', '$apellido_paterno', '$apellido_materno', 
+                            '$password', '$tipo')";
+        
+                if (DatabaseManager::singleAffectedRow($query) === true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        /**
+         * Actualizar el Contenido de un objeto de tipo alumno
+         */
+        static function update($alumno = NULL)
+        {
+            if ($alumno === null)
+            {
+                return false;
+            }
+        
+            $opciones = array('id' => $alumno->getId());
+        
+            $singleAlumno = self::getSingle($opciones);
+        
+            if ($singleAlumno->disimilitud($alumno) > 0)
+            {
+                $nombres          = $alumno->getNombres();
+                $apellido_paterno = $alumno->getApellidoPaterno();
+                $apellido_materno = $alumno->getApellidoMaterno();
+                $password         = $alumno->getPassword();
+                $tipo             = $alumno->getTipo();
+        
+                $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
+        
+                $opciones = array(
+                    'nombres'          => $alumno->getNombres(),
+                    'apellido_paterno' => $alumno->getApellidoPaterno(),
+                    'apellido_materno' => $alumno->getApellidoMaterno(),
+                    'password'         => $alumno->getPassword(),
+                    'tipo'             => $alumno->getTipo(),
+                    'activo'           => 'S'
+                );
+        
+                $singleAlumno = self::getSingle($opciones);
+        
+                if ($singleAlumno == NULL || $singleAlumno->disimilitud($alumno) == 1)
+                {
+                    $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
+        
+                    $query =   "UPDATE $tableAlumno
+                                SET nombres          = '$nombres',
+                                    apellido_paterno = '$apellido_paterno',
+                                    apellido_materno = '$apellido_materno',
+                                    password         = '$password',
+                                    tipo             = '$tipo',
+                                    activo           = 'S'
+                                WHERE $tableAlumno.id = '$id'";
+        
+                    if (DatabaseManager::singleAffectedRow($query) === true)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 ?>
