@@ -845,7 +845,109 @@ public class ExportadorPHP
 			imprimir("{", writer, espacioTabulador+1);
 			imprimir("return false;", writer, espacioTabulador+2);
 			imprimir("}", writer, espacioTabulador+1);
-			imprimir("}", writer, espacioTabulador);	        
+			imprimir("}", writer, espacioTabulador);
+			imprimir("", writer, espacioTabulador);
+			
+			/* Creacion del metodo filter */
+		    imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Recupera varios objeto de tipo " + nombreClase, writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function filter($keysValues = array())", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+		    imprimir("if (!is_array($keysValues) || empty($keysValues))", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("return null;", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase, writer, espacioTabulador+1);
+		    imprimir("              WHERE $table" + nombreClase + ".activo = 'S' AND \";", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);		    
+		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("$query .= \"$table" + nombreClase + ".$key = '$value' AND \";", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("$query = $query . \" ORDER BY \";", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+
+		    //Creanos los if else de los ordenamientos
+	        primera = true;
+	        posicionPrimaria = -1;
+	        for (int i = 0; i < clase.getAtributos().size(); i++)
+	        {
+	        	if (clase.getAtributos().get(i).isDisimil() && !clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	        		
+	        		if (primera)
+	        		{
+	        			imprimir("if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        			primera = false;
+	        		}
+	        		else
+	        		{
+	        			imprimir("else if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        		}
+	        	}
+	        	else if (clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		posicionPrimaria = i;
+	        	}
+	        }
+	        
+	        if (posicionPrimaria != -1)
+	        {
+        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+    			imprimir("else", writer, espacioTabulador+1);
+    			imprimir("{", writer, espacioTabulador+1);
+    			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
+    			imprimir("}", writer, espacioTabulador+1);
+	        }
+	        
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($begin >= 0)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$query = $query. \" LIMIT \" . strval($begin * $cantidad) . \", \" . strval($cantidad+1);", writer, espacioTabulador+2);
+			imprimir("}", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$i = 0;", writer, espacioTabulador+2);
+			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
+			imprimir("{", writer, espacioTabulador+2);
+			imprimir("if ($i == $cantidad && $begin >= 0)", writer, espacioTabulador+3);
+			imprimir("{", writer, espacioTabulador+3);
+			imprimir("continue;", writer, espacioTabulador+4);
+			imprimir("}", writer, espacioTabulador+3);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples[] = $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+3);
+			imprimir("$i++;", writer, espacioTabulador+3);
+			imprimir("}", writer, espacioTabulador+2);
+	    	imprimir("", writer, espacioTabulador);
+	    	imprimir("return $" + nombreClase.toLowerCase() + "_simples;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("else", writer, espacioTabulador+1);
+	    	imprimir("{", writer, espacioTabulador+1);
+	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("}", writer, espacioTabulador);
+	        imprimir("", writer, espacioTabulador);
 	        
 			writer.println("?>");
 			
