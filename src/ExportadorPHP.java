@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
 
 public class ExportadorPHP 
 {
@@ -328,11 +329,254 @@ public class ExportadorPHP
 		{
 			e1.printStackTrace();
 		}
-
 	}
 	
 	public static void exportarControlador(Clase clase)
 	{
+		String nombreClase = toCapitalCase(clase.getNombre());
+		String path = "code/Controlador" + nombreClase + ".php";
+		PrintWriter writer;
+		int espacioTabulador = 0;
+		String tabla = "TABLE_" + nombreClase.toUpperCase();
 		
+		try 
+		{
+			writer = new PrintWriter(path, "UTF-8");
+
+			//Creamos la parte de arriba de la clase
+			writer.println("<?php ");
+			writer.println();
+			espacioTabulador++;
+			
+			imprimir("require_once(__DIR__.\"/" + nombreClase + ".php\");", writer, espacioTabulador);
+			imprimir("require_once(__DIR__.\"/DatabaseManager.php\");", writer, espacioTabulador);
+			imprimir("", writer, espacioTabulador);
+		    imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Clase para Manipular Objetos del Tipo " + nombreClase, writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("class ControladorAlumno", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+		    espacioTabulador++;
+
+		    //Creamos el metodo de getSingle
+		    imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Recupera un objeto de tipo " + nombreClase, writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function getSingle($keysValues = array())", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+		    imprimir("if (!is_array($keysValues) || empty($keysValues))", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("return null;", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase, writer, espacioTabulador+1);
+		    imprimir("              WHERE \";", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);		    
+		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("$query .= \"$table" + nombreClase + ".$key = '$value' AND \";", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("$" + nombreClase.toLowerCase() + "_simple  = DatabaseManager::singleFetchAssoc($query);" , writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== NULL)", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+2);
+		    imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("return $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+1);
+		    imprimir("}", writer, espacioTabulador);		    
+
+		    //Creamos el metodo de get All
+		    imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Obtiene todos los alumnos de la tabla de alumnos", writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function getAll($order = 'id', $begin = 0, $cantidad = 10)", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+			imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase + "", writer, espacioTabulador+1);
+		    imprimir("              WHERE $table" + nombreClase + ".activo = 'S'", writer, espacioTabulador+1);
+		    imprimir("              ORDER BY \";", writer, espacioTabulador+1);
+	        imprimir("", writer, espacioTabulador);
+	        
+	        boolean primera = true;
+	        int posicionPrimaria = -1;
+	        for (int i = 0; i < clase.getAtributos().size(); i++)
+	        {
+	        	if (clase.getAtributos().get(i).isDisimil() && !clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		String nombreAtributo = clase.getAtributos().get(i).getNombre();
+	        		
+	        		if (primera)
+	        		{
+	        			imprimir("if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        			primera = false;
+	        		}
+	        		else
+	        		{
+	        			imprimir("else if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        		}
+	        	}
+	        	else if (clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		posicionPrimaria = i;
+	        	}
+	        }
+	        
+	        if (posicionPrimaria != -1)
+	        {
+        		String nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+    			imprimir("else", writer, espacioTabulador+1);
+    			imprimir("{", writer, espacioTabulador+1);
+    			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
+    			imprimir("}", writer, espacioTabulador+1);
+	        }
+	        
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($begin >= 0)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$query = $query. \" LIMIT \" . strval($begin * $cantidad) . \", \" . strval($cantidad+1);", writer, espacioTabulador+2);
+			imprimir("}", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$i = 0;", writer, espacioTabulador+2);
+			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
+			imprimir("{", writer, espacioTabulador+2);
+			imprimir("if ($i == $cantidad && $begin >= 0)", writer, espacioTabulador+3);
+			imprimir("{", writer, espacioTabulador+3);
+			imprimir("continue;", writer, espacioTabulador+4);
+			imprimir("}", writer, espacioTabulador+3);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples[] = $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+3);
+			imprimir("$i++;", writer, espacioTabulador+3);
+			imprimir("}", writer, espacioTabulador+2);
+	    	imprimir("", writer, espacioTabulador);
+	    	imprimir("return $" + nombreClase.toLowerCase() + "_simples;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("else", writer, espacioTabulador+1);
+	    	imprimir("{", writer, espacioTabulador+1);
+	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("}", writer, espacioTabulador);
+
+			writer.println("?>");
+			
+			writer.close();
+		}
+		catch (FileNotFoundException e1) 
+		{
+			e1.printStackTrace();
+		} 
+		catch (UnsupportedEncodingException e1) 
+		{
+			e1.printStackTrace();
+		}
+	}
+
+	public static void exportarConfiguracionPHP(LinkedList<Clase> clases)
+	{
+		String path = "code/ConfigDatabase.php";
+		PrintWriter writer;
+		int maxEspacio = -1;
+		LinkedList<String> nombreTablas = new LinkedList<String>();
+		
+		for (int i = 0; i < clases.size(); i++)
+		{
+			String tabla = clases.get(i).getNombre();
+			
+			tabla = "TABLE_" + tabla.toUpperCase();
+			
+			if (tabla.length() > maxEspacio)
+			{
+				maxEspacio = tabla.length();
+			}
+			
+			nombreTablas.add(tabla);
+		}
+		
+		try 
+		{
+			writer = new PrintWriter(path, "UTF-8");
+
+			//Creamos la parte de arriba de la clase
+			writer.println("<?php ");
+			writer.println();
+			
+		    String cad = "define('HOST',";
+		    for (int i = 0; i < maxEspacio - 4; i++)
+		    {
+		    	cad += " ";
+		    }
+		    
+		    imprimir(cad +  " 'localhost');", writer, 1);
+
+		    cad = "define('USER',";
+		    for (int i = 0; i < maxEspacio - 4; i++)
+		    {
+		    	cad += " ";
+		    }
+		    
+		    imprimir(cad +  " '');", writer, 1);
+
+		    cad = "define('PASSWORD',";
+		    for (int i = 0; i < maxEspacio - 8; i++)
+		    {
+		    	cad += " ";
+		    }
+		    
+		    imprimir(cad +  " '');", writer, 1);
+
+		    cad = "define('DATABASE',";
+		    for (int i = 0; i < maxEspacio - 8; i++)
+		    {
+		    	cad += " ";
+		    }
+		    
+		    imprimir(cad +  " '');", writer, 1);
+			writer.println();
+
+		    for (int i = 0; i < clases.size(); i++)
+		    {
+			    cad = "define('" + nombreTablas.get(i) + "', ";
+			    for (int j = 0; j < (maxEspacio - nombreTablas.get(i).length()); j++)
+			    {
+			    	cad += " ";
+			    }
+			    
+			    imprimir(cad +  "'" + clases.get(i).getNombre() + "');", writer, 1);
+		    }
+			
+			writer.println("?>");
+			
+			writer.close();
+		}
+		catch (FileNotFoundException e1) 
+		{
+			e1.printStackTrace();
+		} 
+		catch (UnsupportedEncodingException e1) 
+		{
+			e1.printStackTrace();
+		}
 	}
 }

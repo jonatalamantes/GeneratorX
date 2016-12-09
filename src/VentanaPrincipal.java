@@ -654,6 +654,7 @@ public class VentanaPrincipal
 				{
 					ExportadorPHP.exportarClase(clases.get(i));
 					ExportadorPHP.exportarControlador(clases.get(i));
+					ExportadorPHP.exportarConfiguracionPHP(clases);
 				}
 			}
 		});
