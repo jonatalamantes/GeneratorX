@@ -132,6 +132,22 @@
         }
         
         /**
+         * Metodo toString
+         */
+        public function toString()
+        {
+            $cad = '';
+        
+            $cad .= $this->getNombres().' ';
+            $cad .= $this->getApellidoPaterno().' ';
+            $cad .= $this->getApellidoMaterno().' ';
+            $cad .= $this->getPassword().' ';
+            $cad .= $this->getTipo().' ';
+        
+            return $cad;
+        }
+        
+        /**
          * Gets the value of id
          */
         public function getId()

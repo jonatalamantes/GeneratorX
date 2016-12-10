@@ -291,7 +291,28 @@ public class ExportadorPHP
             imprimir("}", writer, espacioTabulador);
             imprimir("", writer, espacioTabulador);
 
-            //Creamos los getters y setters
+            //Creamos el metodo de toString
+			imprimir("/**", writer, espacioTabulador);
+			imprimir(" * Metodo toString", writer, espacioTabulador);
+			imprimir(" */", writer, espacioTabulador);
+			imprimir("public function toString()", writer, espacioTabulador);
+			imprimir("{", writer, espacioTabulador);
+			imprimir("$cad = '';", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			for (int i = 0; i < clase.getAtributos().size(); i++)
+			{
+				if (clase.getAtributos().get(i).isDisimil())
+				{
+					imprimir("$cad .= $this->" + toCamelCase("get_" + clase.getAtributos().get(i).getNombre()) + "().' ';", writer, espacioTabulador+1);
+				}
+			}
+			imprimir("", writer, espacioTabulador);
+			imprimir("return $cad;", writer, espacioTabulador+1);
+			imprimir("}", writer, espacioTabulador);
+			imprimir("", writer, espacioTabulador);
+
+            
+            //Creamos los getters y setters            
             for (int i = 0; i < clase.getAtributos().size(); i++)
             {
             	String nombre = toCamelCase(clase.getAtributos().get(i).getNombre());
@@ -955,7 +976,7 @@ public class ExportadorPHP
 	        imprimir(" */", writer, espacioTabulador);
 	        imprimir("static function remove($" + nombreClase.toLowerCase() + " = null)", writer, espacioTabulador);
 	        imprimir("{", writer, espacioTabulador);
-	        imprimir("if ($alumno === null)", writer, espacioTabulador+1);
+	        imprimir("if ($" + nombreClase.toLowerCase() + " === null)", writer, espacioTabulador+1);
 	        imprimir("{", writer, espacioTabulador+1);
 	        imprimir("return false;", writer, espacioTabulador+2);
 	        imprimir("}", writer, espacioTabulador+1);
@@ -970,7 +991,199 @@ public class ExportadorPHP
 	        imprimir("return DatabaseManager::singleAffectedRow($query);", writer, espacioTabulador+2);
 	        imprimir("}", writer, espacioTabulador+1);
 	        imprimir("}", writer, espacioTabulador);
+
+	        /* Creacion del Metodo simpleSearch */
+	        imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Obtiene los registros coincidentes de los " + nombreClase.toLowerCase() + "s de la tabla de " + nombreClase.toLowerCase() + "s", writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function simpleSearch($string = '', $order = 'id', $begin = 0, $cantidad = 10)", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+			imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase + "", writer, espacioTabulador+1);
+		    imprimir("              WHERE", writer, espacioTabulador+1);
+		    
+		    //Creamos el listado de OR
+		    LinkedList<String> cadenas = new LinkedList<String>();
+		    for (int i = 0; i < clase.getAtributos().size(); i++)
+		    {
+		    	if (clase.getAtributos().get(i).isDisimil())
+		    	{
+		    		cadenas.add("$table" + nombreClase + "." + clase.getAtributos().get(i) + " LIKE '%$string%'");
+		    	}
+		    }
+		    
+		    for (int i = 0; i < cadenas.size(); i++)
+		    {
+		    	if (i == 0 && i == cadenas.size()-1)
+		    	{
+		    		imprimir("          (    " + cadenas.get(i) + ")", writer, espacioTabulador+2);
+		    	}
+		    	else if (i == 0)
+		    	{
+		    		imprimir("          (    " + cadenas.get(i) + " OR ", writer, espacioTabulador+2);
+		    	}
+		    	else if (i == cadenas.size() -1)
+		    	{
+		    		imprimir("               " + cadenas.get(i) + ")", writer, espacioTabulador+2);
+		    	}
+		    	else
+		    	{
+		    		imprimir("               " + cadenas.get(i) + " OR ", writer, espacioTabulador+2);
+		    	}
+		    }
+		    
+		    imprimir("              AND $table" + nombreClase + ".activo = 'S'", writer, espacioTabulador+1);
+		    imprimir("              ORDER BY \";", writer, espacioTabulador+1);
+	        imprimir("", writer, espacioTabulador);
 	        
+	        //Creanos los if else de los ordenamientos
+	        primera = true;
+	        posicionPrimaria = -1;
+	        for (int i = 0; i < clase.getAtributos().size(); i++)
+	        {
+	        	if (clase.getAtributos().get(i).isDisimil() && !clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	        		
+	        		if (primera)
+	        		{
+	        			imprimir("if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        			primera = false;
+	        		}
+	        		else
+	        		{
+	        			imprimir("else if ($order == '" + toCamelCase(nombreAtributo) + "')", writer, espacioTabulador+1);
+	        			imprimir("{", writer, espacioTabulador+1);
+	        			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + "\";", writer, espacioTabulador+2);
+	        			imprimir("}", writer, espacioTabulador+1);
+	        		}
+	        	}
+	        	else if (clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		posicionPrimaria = i;
+	        	}
+	        }
+	        
+	        if (posicionPrimaria != -1)
+	        {
+        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+    			imprimir("else", writer, espacioTabulador+1);
+    			imprimir("{", writer, espacioTabulador+1);
+    			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
+    			imprimir("}", writer, espacioTabulador+1);
+	        }
+	        
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($begin >= 0)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$query = $query. \" LIMIT \" . strval($begin * $cantidad) . \", \" . strval($cantidad+1);", writer, espacioTabulador+2);
+			imprimir("}", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
+			imprimir("", writer, espacioTabulador);
+			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("{", writer, espacioTabulador+1);
+			imprimir("$i = 0;", writer, espacioTabulador+2);
+			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
+			imprimir("{", writer, espacioTabulador+2);
+			imprimir("if ($i == $cantidad && $begin >= 0)", writer, espacioTabulador+3);
+			imprimir("{", writer, espacioTabulador+3);
+			imprimir("continue;", writer, espacioTabulador+4);
+			imprimir("}", writer, espacioTabulador+3);
+			imprimir("", writer, espacioTabulador);
+			imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+3);
+			imprimir("$" + nombreClase.toLowerCase() + "_simples[] = $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+3);
+			imprimir("$i++;", writer, espacioTabulador+3);
+			imprimir("}", writer, espacioTabulador+2);
+	    	imprimir("", writer, espacioTabulador);
+	    	imprimir("return $" + nombreClase.toLowerCase() + "_simples;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("else", writer, espacioTabulador+1);
+	    	imprimir("{", writer, espacioTabulador+1);
+	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("}", writer, espacioTabulador+1);
+	    	imprimir("}", writer, espacioTabulador);
+	        imprimir("", writer, espacioTabulador);
+	        
+	        /* Creacion del Metodo getAutocompletado */
+	        imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Obtiene los registros para un autocompletado", writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function getAutocompletado($string = '')", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+			imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase + "", writer, espacioTabulador+1);
+		    imprimir("              WHERE", writer, espacioTabulador+1);
+		    
+		    //Creamos el listado de OR
+		    cadenas = new LinkedList<String>();
+		    for (int i = 0; i < clase.getAtributos().size(); i++)
+		    {
+		    	if (clase.getAtributos().get(i).isDisimil())
+		    	{
+		    		cadenas.add("$table" + nombreClase + "." + clase.getAtributos().get(i) + " LIKE '%$string%'");
+		    	}
+		    }
+		    
+		    for (int i = 0; i < cadenas.size(); i++)
+		    {
+		    	if (i == 0 && i == cadenas.size()-1)
+		    	{
+		    		imprimir("          (    " + cadenas.get(i) + ")", writer, espacioTabulador+2);
+		    	}
+		    	else if (i == 0)
+		    	{
+		    		imprimir("          (    " + cadenas.get(i) + " OR ", writer, espacioTabulador+2);
+		    	}
+		    	else if (i == cadenas.size() -1)
+		    	{
+		    		imprimir("               " + cadenas.get(i) + ")", writer, espacioTabulador+2);
+		    	}
+		    	else
+		    	{
+		    		imprimir("               " + cadenas.get(i) + " OR ", writer, espacioTabulador+2);
+		    	}
+		    }
+		    
+		    imprimir("              AND $table" + nombreClase + ".activo = 'S'", writer, espacioTabulador+1);
+		    imprimir("              LIMIT 50\";", writer, espacioTabulador+1);
+	        imprimir("", writer, espacioTabulador);
+	        
+	        imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
+	        imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
+	        imprimir("$return         = array();", writer, espacioTabulador+1);
+	        imprimir("", writer, espacioTabulador);
+	        imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+	        imprimir("{", writer, espacioTabulador+1);
+	        imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple)", writer, espacioTabulador+2); 
+	        imprimir("{", writer, espacioTabulador+2);
+	        imprimir("$" + nombreClase.toLowerCase() + " = new " + nombreClase + "();", writer, espacioTabulador+3);
+	        imprimir("$" + nombreClase.toLowerCase() + "->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+3);
+	        imprimir("array_push($return, array('label' => $" + nombreClase.toLowerCase() + "->toString(),", writer, espacioTabulador+3);
+	        imprimir("'" + clase.getPrimaria().getNombre() + "' => $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombre()) + "())", writer, espacioTabulador+5);
+	        imprimir(");", writer, espacioTabulador+3);
+	        imprimir("}", writer, espacioTabulador+2);
+	        imprimir("", writer, espacioTabulador);
+	        imprimir("return json_encode($return);", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("else", writer, espacioTabulador+1);
+	        imprimir("{", writer, espacioTabulador+1);
+	        imprimir("return null;", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("}", writer, espacioTabulador);
+	        
+	        //Terminamos la clase
+	        espacioTabulador--;
+	        imprimir("}", writer, espacioTabulador);
 			writer.println("?>");
 			
 			writer.close();
