@@ -875,7 +875,7 @@ public class ExportadorPHP
 		    imprimir("$query = $query . \" ORDER BY \";", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 
-		    //Creanos los if else de los ordenamientos
+		    //Creamos los if else de los ordenamientos
 	        primera = true;
 	        posicionPrimaria = -1;
 	        for (int i = 0; i < clase.getAtributos().size(); i++)
@@ -948,6 +948,28 @@ public class ExportadorPHP
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("}", writer, espacioTabulador);
 	        imprimir("", writer, espacioTabulador);
+	        
+	        /* Creacion del Metodo remove */
+	        imprimir("/**", writer, espacioTabulador);
+	        imprimir(" * Elimina logicamente un " + nombreClase + "", writer, espacioTabulador);
+	        imprimir(" */", writer, espacioTabulador);
+	        imprimir("static function remove($" + nombreClase.toLowerCase() + " = null)", writer, espacioTabulador);
+	        imprimir("{", writer, espacioTabulador);
+	        imprimir("if ($alumno === null)", writer, espacioTabulador+1);
+	        imprimir("{", writer, espacioTabulador+1);
+	        imprimir("return false;", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("else", writer, espacioTabulador+1);
+	        imprimir("{", writer, espacioTabulador+1);
+		    imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+2);
+		    imprimir("$" + clase.getPrimaria().getNombre() + " = $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombre()) + "();", writer, espacioTabulador+2);
+	        imprimir("", writer, espacioTabulador+2);
+	        imprimir("$query = \"UPDATE $table" + nombreClase, writer, espacioTabulador+2);
+	        imprimir("          SET activo = 'N' WHERE " + clase.getPrimaria().getNombre() + " = $" + clase.getPrimaria().getNombre() + "\";", writer, espacioTabulador+2);
+	        imprimir("", writer, espacioTabulador);
+	        imprimir("return DatabaseManager::singleAffectedRow($query);", writer, espacioTabulador+2);
+	        imprimir("}", writer, espacioTabulador+1);
+	        imprimir("}", writer, espacioTabulador);
 	        
 			writer.println("?>");
 			
