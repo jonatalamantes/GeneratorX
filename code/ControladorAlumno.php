@@ -60,11 +60,11 @@
             }
             else if ($order == 'apellidoPaterno')
             {
-                $query = $query . " $tableAlumno.apellido_paterno";
+                $query = $query . " $tableAlumno.apellidoPaterno";
             }
             else if ($order == 'apellidoMaterno')
             {
-                $query = $query . " $tableAlumno.apellido_materno";
+                $query = $query . " $tableAlumno.apellidoMaterno";
             }
             else if ($order == 'password')
             {
@@ -122,31 +122,31 @@
             }
         
             $opciones = array(
-                'nombres'          => $alumno->getNombres(),
-                'apellido_paterno' => $alumno->getApellidoPaterno(),
-                'apellido_materno' => $alumno->getApellidoMaterno(),
-                'password'         => $alumno->getPassword(),
-                'tipo'             => $alumno->getTipo(),
-                'activo'           => 'S'
+                'nombres'         => $alumno->getNombres(),
+                'apellidoPaterno' => $alumno->getApellidoPaterno(),
+                'apellidoMaterno' => $alumno->getApellidoMaterno(),
+                'password'        => $alumno->getPassword(),
+                'tipo'            => $alumno->getTipo(),
+                'activo'          => 'S'
             );
         
             $singleAlumno = self::getSingle($opciones);
         
             if ($singleAlumno == NULL || $singleAlumno->disimilitud($alumno) == 1)
             {
-                $nombres          = $alumno->getNombres();
-                $apellido_paterno = $alumno->getApellidoPaterno();
-                $apellido_materno = $alumno->getApellidoMaterno();
-                $password         = $alumno->getPassword();
-                $tipo             = $alumno->getTipo();
+                $nombres         = $alumno->getNombres();
+                $apellidoPaterno = $alumno->getApellidoPaterno();
+                $apellidoMaterno = $alumno->getApellidoMaterno();
+                $password        = $alumno->getPassword();
+                $tipo            = $alumno->getTipo();
         
                 $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
         
                 $query   = "INSERT INTO $tableAlumno 
-                            (nombres, apellido_paterno, apellido_materno, 
+                            (nombres, apellidoPaterno, apellidoMaterno, 
                             password, tipo)
                             VALUES
-                            ('$nombres', '$apellido_paterno', '$apellido_materno', 
+                            ('$nombres', '$apellidoPaterno', '$apellidoMaterno', 
                             '$password', '$tipo')";
         
                 if (DatabaseManager::singleAffectedRow($query) === true)
@@ -180,21 +180,22 @@
         
             if ($singleAlumno->disimilitud($alumno) > 0)
             {
-                $nombres          = $alumno->getNombres();
-                $apellido_paterno = $alumno->getApellidoPaterno();
-                $apellido_materno = $alumno->getApellidoMaterno();
-                $password         = $alumno->getPassword();
-                $tipo             = $alumno->getTipo();
+                $id              = $alumno->getId();
+                $nombres         = $alumno->getNombres();
+                $apellidoPaterno = $alumno->getApellidoPaterno();
+                $apellidoMaterno = $alumno->getApellidoMaterno();
+                $password        = $alumno->getPassword();
+                $tipo            = $alumno->getTipo();
         
                 $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
         
                 $opciones = array(
-                    'nombres'          => $alumno->getNombres(),
-                    'apellido_paterno' => $alumno->getApellidoPaterno(),
-                    'apellido_materno' => $alumno->getApellidoMaterno(),
-                    'password'         => $alumno->getPassword(),
-                    'tipo'             => $alumno->getTipo(),
-                    'activo'           => 'S'
+                    'nombres'         => $alumno->getNombres(),
+                    'apellidoPaterno' => $alumno->getApellidoPaterno(),
+                    'apellidoMaterno' => $alumno->getApellidoMaterno(),
+                    'password'        => $alumno->getPassword(),
+                    'tipo'            => $alumno->getTipo(),
+                    'activo'          => 'S'
                 );
         
                 $singleAlumno = self::getSingle($opciones);
@@ -204,12 +205,12 @@
                     $tableAlumno  = DatabaseManager::getNameTable('TABLE_ALUMNO');
         
                     $query =   "UPDATE $tableAlumno
-                                SET nombres          = '$nombres',
-                                    apellido_paterno = '$apellido_paterno',
-                                    apellido_materno = '$apellido_materno',
-                                    password         = '$password',
-                                    tipo             = '$tipo',
-                                    activo           = 'S'
+                                SET nombres         = '$nombres',
+                                    apellidoPaterno = '$apellidoPaterno',
+                                    apellidoMaterno = '$apellidoMaterno',
+                                    password        = '$password',
+                                    tipo            = '$tipo',
+                                    activo          = 'S'
                                 WHERE $tableAlumno.id = '$id'";
         
                     if (DatabaseManager::singleAffectedRow($query) === true)
@@ -263,11 +264,11 @@
             }
             else if ($order == 'apellidoPaterno')
             {
-                $query = $query . " $tableAlumno.apellido_paterno";
+                $query = $query . " $tableAlumno.apellidoPaterno";
             }
             else if ($order == 'apellidoMaterno')
             {
-                $query = $query . " $tableAlumno.apellido_materno";
+                $query = $query . " $tableAlumno.apellidoMaterno";
             }
             else if ($order == 'password')
             {
@@ -345,8 +346,8 @@
                           FROM $tableAlumno
                           WHERE
                           (    $tableAlumno.nombres LIKE '%$string%' OR 
-                               $tableAlumno.apellido_paterno LIKE '%$string%' OR 
-                               $tableAlumno.apellido_materno LIKE '%$string%' OR 
+                               $tableAlumno.apellidoPaterno LIKE '%$string%' OR 
+                               $tableAlumno.apellidoMaterno LIKE '%$string%' OR 
                                $tableAlumno.password LIKE '%$string%' OR 
                                $tableAlumno.tipo LIKE '%$string%')
                           AND $tableAlumno.activo = 'S'
@@ -358,11 +359,11 @@
             }
             else if ($order == 'apellidoPaterno')
             {
-                $query = $query . " $tableAlumno.apellido_paterno";
+                $query = $query . " $tableAlumno.apellidoPaterno";
             }
             else if ($order == 'apellidoMaterno')
             {
-                $query = $query . " $tableAlumno.apellido_materno";
+                $query = $query . " $tableAlumno.apellidoMaterno";
             }
             else if ($order == 'password')
             {
@@ -420,8 +421,8 @@
                           FROM $tableAlumno
                           WHERE
                           (    $tableAlumno.nombres LIKE '%$string%' OR 
-                               $tableAlumno.apellido_paterno LIKE '%$string%' OR 
-                               $tableAlumno.apellido_materno LIKE '%$string%' OR 
+                               $tableAlumno.apellidoPaterno LIKE '%$string%' OR 
+                               $tableAlumno.apellidoMaterno LIKE '%$string%' OR 
                                $tableAlumno.password LIKE '%$string%' OR 
                                $tableAlumno.tipo LIKE '%$string%')
                           AND $tableAlumno.activo = 'S'

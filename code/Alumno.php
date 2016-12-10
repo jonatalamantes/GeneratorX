@@ -17,17 +17,17 @@
         /**
          * Constructor de la Clase
          */
-        function __construct($id = "", $nombres = "", $apellido_paterno = "", 
-                            $apellido_materno = "", $password = "", $activo = "", 
-                            $fecha_registro = "", $tipo = "")
+        function __construct($id = "", $nombres = "", $apellidoPaterno = "", 
+                            $apellidoMaterno = "", $password = "", $activo = "", 
+                            $fechaRegistro = "", $tipo = "")
         {
             $this->id              = $id;
             $this->nombres         = $nombres;
-            $this->apellidoPaterno = $apellido_paterno;
-            $this->apellidoMaterno = $apellido_materno;
+            $this->apellidoPaterno = $apellidoPaterno;
+            $this->apellidoMaterno = $apellidoMaterno;
             $this->password        = $password;
             $this->activo          = $activo;
-            $this->fechaRegistro   = $fecha_registro;
+            $this->fechaRegistro   = $fechaRegistro;
             $this->tipo            = $tipo;
         }
         
@@ -42,14 +42,14 @@
         
             if ($this !== null)
             {
-                $array["id"]               = $this->getId();
-                $array["nombres"]          = $this->getNombres();
-                $array["apellido_paterno"] = $this->getApellidoPaterno();
-                $array["apellido_materno"] = $this->getApellidoMaterno();
-                $array["password"]         = $this->getPassword();
-                $array["activo"]           = $this->getActivo();
-                $array["fecha_registro"]   = $this->getFechaRegistro();
-                $array["tipo"]             = $this->getTipo();
+                $array["id"]              = $this->getId();
+                $array["nombres"]         = $this->getNombres();
+                $array["apellidoPaterno"] = $this->getApellidoPaterno();
+                $array["apellidoMaterno"] = $this->getApellidoMaterno();
+                $array["password"]        = $this->getPassword();
+                $array["activo"]          = $this->getActivo();
+                $array["fechaRegistro"]   = $this->getFechaRegistro();
+                $array["tipo"]            = $this->getTipo();
             }
         
             return $array;
@@ -66,11 +66,11 @@
             {
                 $this->setId($array["id"]);
                 $this->setNombres($array["nombres"]);
-                $this->setApellidoPaterno($array["apellido_paterno"]);
-                $this->setApellidoMaterno($array["apellido_materno"]);
+                $this->setApellidoPaterno($array["apellidoPaterno"]);
+                $this->setApellidoMaterno($array["apellidoMaterno"]);
                 $this->setPassword($array["password"]);
                 $this->setActivo($array["activo"]);
-                $this->setFechaRegistro($array["fecha_registro"]);
+                $this->setFechaRegistro($array["fechaRegistro"]);
                 $this->setTipo($array["tipo"]);
             }
         }

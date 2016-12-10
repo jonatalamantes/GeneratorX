@@ -23,13 +23,12 @@ public class ExportadorPHP
 
 				if (mayuscula)
 				{
-					
 					cadNueva += temp.toUpperCase();
 					mayuscula = false;
 				}
 				else
 				{
-					cadNueva += temp.toLowerCase();
+					cadNueva += temp;
 				}
 			}
 		}
@@ -720,8 +719,7 @@ public class ExportadorPHP
 	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
-	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
-	    			clase.getAtributos().get(i).isPrimaria())
+	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro"))
 	    		{
 	    			continue;
 	    		}
@@ -873,7 +871,7 @@ public class ExportadorPHP
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Recupera varios objeto de tipo " + nombreClase, writer, espacioTabulador);
 		    imprimir(" */", writer, espacioTabulador);
-		    imprimir("static function filter($keysValues = array())", writer, espacioTabulador);
+		    imprimir("static function filter($keysValues = array(), $order = 'id', $begin = 0, $cantidad = 10)", writer, espacioTabulador);
 		    imprimir("{", writer, espacioTabulador);
 		    imprimir("if (!is_array($keysValues) || empty($keysValues))", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
@@ -888,7 +886,7 @@ public class ExportadorPHP
 		    imprimir("", writer, espacioTabulador);		    
 		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
-		    imprimir("$query .= \"$table" + nombreClase + ".$key = '$value' AND \";", writer, espacioTabulador+2);
+		    imprimir("$query .= \"$table" + nombreClase + ".$key LIKE '%$value%' AND \";", writer, espacioTabulador+2);
 		    imprimir("}", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
