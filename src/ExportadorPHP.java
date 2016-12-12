@@ -109,7 +109,7 @@ public class ExportadorPHP
 			//Creamos los atributos
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				imprimir("private $" + toCamelCase(clase.getAtributos().get(i).getNombre()) + ";", writer, espacioTabulador);
+				imprimir("private $" + toCamelCase(clase.getAtributos().get(i).getNombreNP()) + ";", writer, espacioTabulador);
 			}
 			
 			writer.println("");
@@ -135,7 +135,7 @@ public class ExportadorPHP
 				if (i == 0)
 				{
 					primero = true;
-					cadAcumulada += "$" + atributoActual.getNombre() + " = " + defecto + ", "; 
+					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", "; 
 				}
 				else if (i % 3 == 0)
 				{
@@ -156,11 +156,11 @@ public class ExportadorPHP
 					}		
 					
 					cadAcumulada = "";
-					cadAcumulada += "$" + atributoActual.getNombre() + " = " + defecto + ", ";
+					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", ";
 				}
 				else
 				{
-					cadAcumulada += "$" + atributoActual.getNombre() + " = " + defecto + ", ";
+					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", ";
 				}
 			}
 			
@@ -183,15 +183,15 @@ public class ExportadorPHP
 			
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				String cad = "$this->" + toCamelCase(clase.getAtributos().get(i).getNombre());
-				int tam = getTamEspacios(clase.getAtributos().get(i).getNombre(), clase, true);
+				String cad = "$this->" + toCamelCase(clase.getAtributos().get(i).getNombreNP());
+				int tam = getTamEspacios(clase.getAtributos().get(i).getNombreNP(), clase, true);
 				
 				for (int j = 0; j < tam; j++)
 				{
 					cad += " ";
 				}
 				
-				cad += " = $" + clase.getAtributos().get(i).getNombre() + ";";  
+				cad += " = $" + clase.getAtributos().get(i).getNombreNP() + ";";  
 				
 				imprimir(cad, writer, espacioTabulador+1);
 			}
@@ -221,7 +221,7 @@ public class ExportadorPHP
 					cad += " ";
 				}
 				
-				cad += " = $this->" + toCamelCase("get_" + clase.getAtributos().get(i).getNombre()) + "();";  
+				cad += " = $this->" + toCamelCase("get_" + clase.getAtributos().get(i).getNombreNP()) + "();";  
 				
 				imprimir(cad, writer, espacioTabulador+2);
 			}
@@ -243,7 +243,7 @@ public class ExportadorPHP
 			imprimir("{", writer, espacioTabulador+1);
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				String cad = "$this->" + toCamelCase("set_" + clase.getAtributos().get(i).getNombre()) + "(";
+				String cad = "$this->" + toCamelCase("set_" + clase.getAtributos().get(i).getNombreNP()) + "(";
 				cad += "$array[\"" + clase.getAtributos().get(i).getNombre() + "\"]);";  
 				
 				imprimir(cad, writer, espacioTabulador+2);
@@ -274,7 +274,7 @@ public class ExportadorPHP
 			{
 				if (clase.getAtributos().get(i).isDisimil())
 				{
-					String getter = toCamelCase("get_" + clase.getAtributos().get(i).getNombre());
+					String getter = toCamelCase("get_" + clase.getAtributos().get(i).getNombreNP());
 					
 					imprimir("if ($obj->" + getter + "() != $this->" + getter + "())", writer, espacioTabulador+1);
 					imprimir("{", writer, espacioTabulador+1);
@@ -302,7 +302,7 @@ public class ExportadorPHP
 			{
 				if (clase.getAtributos().get(i).isDisimil())
 				{
-					imprimir("$cad .= $this->" + toCamelCase("get_" + clase.getAtributos().get(i).getNombre()) + "().' ';", writer, espacioTabulador+1);
+					imprimir("$cad .= $this->" + toCamelCase("get_" + clase.getAtributos().get(i).getNombreNP()) + "().' ';", writer, espacioTabulador+1);
 				}
 			}
 			imprimir("", writer, espacioTabulador);
@@ -314,9 +314,9 @@ public class ExportadorPHP
             //Creamos los getters y setters            
             for (int i = 0; i < clase.getAtributos().size(); i++)
             {
-            	String nombre = toCamelCase(clase.getAtributos().get(i).getNombre());
-            	String nombreGetter = toCamelCase("get_" + clase.getAtributos().get(i).getNombre());
-            	String nombreSetter = toCamelCase("set_" + clase.getAtributos().get(i).getNombre());
+            	String nombre = toCamelCase(clase.getAtributos().get(i).getNombreNP());
+            	String nombreGetter = toCamelCase("get_" + clase.getAtributos().get(i).getNombreNP());
+            	String nombreSetter = toCamelCase("set_" + clase.getAtributos().get(i).getNombreNP());
             	
             	imprimir("/**", writer, espacioTabulador);
             	imprimir(" * Gets the value of " + nombre, writer, espacioTabulador);
@@ -414,6 +414,30 @@ public class ExportadorPHP
 		    imprimir("}", writer, espacioTabulador);		    
 	        imprimir("", writer, espacioTabulador);
 
+		    /* Creamos el metodo de getUltimo */
+		    imprimir("/**", writer, espacioTabulador);
+		    imprimir(" * Recupera un objeto de tipo " + nombreClase, writer, espacioTabulador);
+		    imprimir(" */", writer, espacioTabulador);
+		    imprimir("static function getUltimo()", writer, espacioTabulador);
+		    imprimir("{", writer, espacioTabulador);
+		    imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
+		    imprimir("              FROM $table" + nombreClase, writer, espacioTabulador+1);
+		    imprimir("              ORDER BY $table" + nombreClase + "." + clase.getPrimaria().getNombre() + " DESC \";", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);		    
+		    imprimir("$" + nombreClase.toLowerCase() + "_simple  = DatabaseManager::singleFetchAssoc($query);" , writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador+1);
+		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== NULL)", writer, espacioTabulador+1);
+		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+2);
+		    imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+2);
+		    imprimir("}", writer, espacioTabulador+1);
+		    imprimir("", writer, espacioTabulador);
+		    imprimir("return $" + nombreClase.toLowerCase() + "A;", writer, espacioTabulador+1);
+		    imprimir("}", writer, espacioTabulador);		    
+	        imprimir("", writer, espacioTabulador);
+
 		    /* Creamos el metodo de getAll */
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Obtiene todos los " + nombreClase.toLowerCase() + "s de la tabla de " + nombreClase.toLowerCase() + "s", writer, espacioTabulador);
@@ -461,7 +485,7 @@ public class ExportadorPHP
 	        
 	        if (posicionPrimaria != -1)
 	        {
-        		String nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+        		String nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombreNP();
     			imprimir("else", writer, espacioTabulador+1);
     			imprimir("{", writer, espacioTabulador+1);
     			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
@@ -520,9 +544,10 @@ public class ExportadorPHP
 	    	{
 	    		if (clase.getAtributos().get(i).isDisimil())
 	    		{
-		    		String nombreAtributo = clase.getAtributos().get(i).getNombre(); 
-		    		String cad = "'" + nombreAtributo + "'";
-		    		int tam = getTamEspacios(nombreAtributo, clase, false);
+		    		String nombreAtributo = clase.getAtributos().get(i).getNombreNP(); 
+		    		String nombreAtributo2 = clase.getAtributos().get(i).getNombre(); 
+		    		String cad = "'" + nombreAtributo2 + "'";
+		    		int tam = getTamEspacios(nombreAtributo2, clase, false);
 		    		for (int j = 0; j < tam; j++)
 		    		{
 		    			cad += " ";
@@ -531,7 +556,8 @@ public class ExportadorPHP
 		    		imprimir(cad, writer, espacioTabulador+2);
 	    		}	    		
 	    	}
-    		String nombreAtributo = "activo"; 
+    		String nombreAtributo  = "activo"; 
+    		String nombreAtributo2 = "activo"; 
     		String cad = "'" + nombreAtributo + "'";
     		int tam = getTamEspacios(nombreAtributo, clase, false);
     		for (int j = 0; j < tam; j++)
@@ -552,7 +578,8 @@ public class ExportadorPHP
 	    	//Generamos las variables de insercion
 	    	for (int i = 0; i < clase.getAtributos().size(); i++)
 	    	{	    		
-	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo  = clase.getAtributos().get(i).getNombreNP();
+	    		nombreAtributo2 = clase.getAtributos().get(i).getNombre();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
@@ -581,7 +608,8 @@ public class ExportadorPHP
 	    	int interno = -1;
 	    	for (int i = 0; i < clase.getAtributos().size(); i++)
 	    	{
-	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo  = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo2 = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
@@ -597,7 +625,7 @@ public class ExportadorPHP
 	    		if (interno == 0)
 	    		{
 	    			cad += "(";
-	    			cad += clase.getAtributos().get(i).getNombre() + ", ";
+	    			cad += nombreAtributo + ", ";
 	    		}
 	    		else if (interno % 3 == 0)
 	    		{					
@@ -609,11 +637,11 @@ public class ExportadorPHP
 					
 					imprimir(cad, writer, espacioTabulador+5);
 					cad = "";
-					cad += clase.getAtributos().get(i).getNombre() + ", ";
+					cad += nombreAtributo + ", ";
 	    		}
 	    		else
 	    		{
-	    			cad += clase.getAtributos().get(i).getNombre() + ", ";
+	    			cad += nombreAtributo + ", ";
 	    		}
 	    	}
 	    	
@@ -630,7 +658,7 @@ public class ExportadorPHP
 	    	interno = -1;
 	    	for (int i = 0; i < clase.getAtributos().size(); i++)
 	    	{
-	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
@@ -646,7 +674,7 @@ public class ExportadorPHP
 	    		if (interno == 0)
 	    		{
 	    			cad += "(";
-	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    			cad += "'$" + nombreAtributo + "', ";
 	    		}
 	    		else if (interno % 3 == 0)
 	    		{    			
@@ -658,11 +686,11 @@ public class ExportadorPHP
 					
 					imprimir(cad, writer, espacioTabulador+5);
 					cad = "";
-	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    			cad += "'$" + nombreAtributo + "', ";
 	    		}
 	    		else
 	    		{
-	    			cad += "'$" + clase.getAtributos().get(i).getNombre() + "', ";
+	    			cad += "'$" + nombreAtributo + "', ";
 	    		}
 	    	}
 	    	
@@ -693,8 +721,8 @@ public class ExportadorPHP
 	        imprimir("", writer, espacioTabulador);
 	        
 	        /* Agregamos el metodo de update */
-	        String nombrePrimaria = clase.getPrimaria().getNombre();
-	        String getterPrimaria = toCamelCase("get_" + clase.getPrimaria().getNombre()); 
+	        String nombrePrimaria = clase.getPrimaria().getNombreNP();
+	        String getterPrimaria = toCamelCase("get_" + clase.getPrimaria().getNombreNP()); 
 	        
 	        imprimir("/**", writer, espacioTabulador);
 	        imprimir(" * Actualizar el Contenido de un objeto de tipo " + nombreClase.toLowerCase(), writer, espacioTabulador);
@@ -716,7 +744,7 @@ public class ExportadorPHP
 	    	//Generamos las variables de insercion
 	    	for (int i = 0; i < clase.getAtributos().size(); i++)
 	    	{	    		
-	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro"))
@@ -744,9 +772,11 @@ public class ExportadorPHP
 	    	{
 	    		if (clase.getAtributos().get(i).isDisimil())
 	    		{
-		    		nombreAtributo = clase.getAtributos().get(i).getNombre(); 
-		    		cad = "'" + nombreAtributo + "'";
-		    		tam = getTamEspacios(nombreAtributo, clase, false);
+		    		nombreAtributo  = clase.getAtributos().get(i).getNombreNP(); 
+		    		nombreAtributo2 = clase.getAtributos().get(i).getNombre(); 
+		    		
+		    		cad = "'" + nombreAtributo2 + "'";
+		    		tam = getTamEspacios(nombreAtributo2, clase, false);
 		    		for (int j = 0; j < tam; j++)
 		    		{
 		    			cad += " ";
@@ -783,7 +813,8 @@ public class ExportadorPHP
     		interno = 0;
 	    	for (int i = 0; i < clase.getAtributos().size(); i++)
 	    	{
-	    		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo  = clase.getAtributos().get(i).getNombre();
+	    		nombreAtributo2 = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
@@ -812,7 +843,7 @@ public class ExportadorPHP
     					temp += " ";
     				}
     				
-    				temp += " = '$" + nombreAtributo + "',";
+    				temp += " = '$" + nombreAtributo2 + "',";
     				
     				imprimir(temp, writer, espacioTabulador+6);
 	    		}
@@ -842,7 +873,7 @@ public class ExportadorPHP
 			imprimir(cad, writer, espacioTabulador+6);
 
 	    	
-    		imprimir("WHERE $table" + nombreClase + "." + clase.getPrimaria().getNombre() + " = '$" + clase.getPrimaria().getNombre() + "'\";", writer, espacioTabulador+6);
+    		imprimir("WHERE $table" + nombreClase + "." + clase.getPrimaria().getNombreNP() + " = '$" + clase.getPrimaria().getNombreNP() + "'\";", writer, espacioTabulador+6);
 
 			//Continuamos
 	        imprimir("", writer, espacioTabulador);
@@ -927,7 +958,7 @@ public class ExportadorPHP
 	        
 	        if (posicionPrimaria != -1)
 	        {
-        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombreNP();
     			imprimir("else", writer, espacioTabulador+1);
     			imprimir("{", writer, espacioTabulador+1);
     			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
@@ -981,10 +1012,10 @@ public class ExportadorPHP
 	        imprimir("else", writer, espacioTabulador+1);
 	        imprimir("{", writer, espacioTabulador+1);
 		    imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+2);
-		    imprimir("$" + clase.getPrimaria().getNombre() + " = $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombre()) + "();", writer, espacioTabulador+2);
+		    imprimir("$" + clase.getPrimaria().getNombreNP() + " = $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombreNP()) + "();", writer, espacioTabulador+2);
 	        imprimir("", writer, espacioTabulador+2);
 	        imprimir("$query = \"UPDATE $table" + nombreClase, writer, espacioTabulador+2);
-	        imprimir("          SET activo = 'N' WHERE " + clase.getPrimaria().getNombre() + " = $" + clase.getPrimaria().getNombre() + "\";", writer, espacioTabulador+2);
+	        imprimir("          SET activo = 'N' WHERE " + clase.getPrimaria().getNombreNP() + " = $" + clase.getPrimaria().getNombreNP() + "\";", writer, espacioTabulador+2);
 	        imprimir("", writer, espacioTabulador);
 	        imprimir("return DatabaseManager::singleAffectedRow($query);", writer, espacioTabulador+2);
 	        imprimir("}", writer, espacioTabulador+1);
@@ -1043,7 +1074,7 @@ public class ExportadorPHP
 	        {
 	        	if (clase.getAtributos().get(i).isDisimil() && !clase.getAtributos().get(i).isPrimaria())
 	        	{
-	        		nombreAtributo = clase.getAtributos().get(i).getNombre();
+	        		nombreAtributo = clase.getAtributos().get(i).getNombreNP();
 	        		
 	        		if (primera)
 	        		{
@@ -1069,7 +1100,7 @@ public class ExportadorPHP
 	        
 	        if (posicionPrimaria != -1)
 	        {
-        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombre();
+        		nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombreNP();
     			imprimir("else", writer, espacioTabulador+1);
     			imprimir("{", writer, espacioTabulador+1);
     			imprimir("$query = $query . \" $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+2);
@@ -1167,7 +1198,7 @@ public class ExportadorPHP
 	        imprimir("$" + nombreClase.toLowerCase() + " = new " + nombreClase + "();", writer, espacioTabulador+3);
 	        imprimir("$" + nombreClase.toLowerCase() + "->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+3);
 	        imprimir("array_push($return, array('label' => $" + nombreClase.toLowerCase() + "->toString(),", writer, espacioTabulador+3);
-	        imprimir("'" + clase.getPrimaria().getNombre() + "' => $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombre()) + "())", writer, espacioTabulador+5);
+	        imprimir("'" + clase.getPrimaria().getNombreNP() + "' => $" + nombreClase.toLowerCase() + "->" + toCamelCase("get_" + clase.getPrimaria().getNombreNP()) + "())", writer, espacioTabulador+5);
 	        imprimir(");", writer, espacioTabulador+3);
 	        imprimir("}", writer, espacioTabulador+2);
 	        imprimir("", writer, espacioTabulador);

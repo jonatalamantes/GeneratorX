@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class AtributoClase 
 {
 	/**
@@ -50,6 +52,8 @@ public class AtributoClase
 	 */
 	private String defecto;
 	
+	private LinkedList<String> prefijos; 
+	
 	AtributoClase()
 	{
 		this.id = 0;
@@ -61,6 +65,10 @@ public class AtributoClase
 		this.nula = false;
 		this.disimil = false;
 		this.defecto = "";
+		this.prefijos = new LinkedList<String>();
+		
+		this.prefijos.add("tcat_");
+		this.prefijos.add("t");
 	}
 
 	public int getId() 
@@ -75,7 +83,44 @@ public class AtributoClase
 
 	public String getNombre() 
 	{
-		return nombre;
+		return this.nombre;
+	}
+
+	public String getNombreNP() 
+	{
+		if (this.isForanea())
+		{
+			String nombreTemp = "";
+			String nombreAttr = this.nombre;
+			String nombrePrefijo = "";
+			
+			for (int i = 0; i < this.prefijos.size(); i++)
+			{
+				nombrePrefijo = this.prefijos.get(i);
+				
+				System.out.println(nombreAttr+ " "+ nombrePrefijo);
+				
+				if (nombreAttr.length() > nombrePrefijo.length())
+				{
+					nombreTemp = nombreAttr.substring(0, nombrePrefijo.length());
+					
+					System.out.println(nombreTemp);
+					
+					if (nombreTemp.equals(nombrePrefijo))
+					{
+						nombreTemp = nombreAttr.substring(nombreTemp.length()); 
+						System.out.println("Retornando: " + nombreTemp);
+						return nombreTemp;
+					}
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+
+		return this.nombre;
 	}
 
 	public void setNombre(String nombre) 
