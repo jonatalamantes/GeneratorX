@@ -902,7 +902,7 @@ public class ExportadorPHP
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Recupera varios objeto de tipo " + nombreClase, writer, espacioTabulador);
 		    imprimir(" */", writer, espacioTabulador);
-		    imprimir("static function filter($keysValues = array(), $order = 'id', $begin = 0, $cantidad = 10)", writer, espacioTabulador);
+		    imprimir("static function filter($keysValues = array(), $order = 'id', $begin = 0, $cantidad = 10, $exact = false)", writer, espacioTabulador);
 		    imprimir("{", writer, espacioTabulador);
 		    imprimir("if (!is_array($keysValues) || empty($keysValues))", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
@@ -917,6 +917,14 @@ public class ExportadorPHP
 		    imprimir("", writer, espacioTabulador);		    
 		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
+		    imprimir("if ($exact)", writer, espacioTabulador+2);
+		    imprimir("{", writer, espacioTabulador+2);
+		    imprimir("$query .= \"$key = '$value' AND \";", writer, espacioTabulador+3);
+		    imprimir("}", writer, espacioTabulador+2);
+		    imprimir("else", writer, espacioTabulador+2);
+		    imprimir("{", writer, espacioTabulador+2);
+		    imprimir("$query .= \"$key LIKE '%$value%' AND \";", writer, espacioTabulador+3);
+		    imprimir("}", writer, espacioTabulador+2);
 		    imprimir("$query .= \"$table" + nombreClase + ".$key LIKE '%$value%' AND \";", writer, espacioTabulador+2);
 		    imprimir("}", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
