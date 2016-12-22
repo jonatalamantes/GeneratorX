@@ -925,7 +925,6 @@ public class ExportadorPHP
 		    imprimir("{", writer, espacioTabulador+2);
 		    imprimir("$query .= \"$key LIKE '%$value%' AND \";", writer, espacioTabulador+3);
 		    imprimir("}", writer, espacioTabulador+2);
-		    imprimir("$query .= \"$table" + nombreClase + ".$key LIKE '%$value%' AND \";", writer, espacioTabulador+2);
 		    imprimir("}", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
