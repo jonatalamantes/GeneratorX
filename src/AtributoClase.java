@@ -97,19 +97,14 @@ public class AtributoClase
 			for (int i = 0; i < this.prefijos.size(); i++)
 			{
 				nombrePrefijo = this.prefijos.get(i);
-				
-				System.out.println(nombreAttr+ " "+ nombrePrefijo);
-				
+								
 				if (nombreAttr.length() > nombrePrefijo.length())
 				{
 					nombreTemp = nombreAttr.substring(0, nombrePrefijo.length());
-					
-					System.out.println(nombreTemp);
-					
+										
 					if (nombreTemp.equals(nombrePrefijo))
 					{
 						nombreTemp = nombreAttr.substring(nombreTemp.length()); 
-						System.out.println("Retornando: " + nombreTemp);
 						return nombreTemp;
 					}
 				}
