@@ -87,7 +87,7 @@ public class ExportadorPHP
 	public static void exportarClase(Clase clase)
 	{
 		String nombreClase = toCapitalCase(clase.getNombre());
-		String path = "code/" + nombreClase + ".php";
+		String path = "code/Classes/" + nombreClase + ".php";
 		PrintWriter writer;
 		int espacioTabulador = 0;
 		
@@ -119,71 +119,74 @@ public class ExportadorPHP
 			imprimir(" * Constructor de la Clase", writer, espacioTabulador);
 			imprimir(" */", writer, espacioTabulador);
 			
-			String cadAcumulada = "function __construct(";
-			boolean primero = false;
-			for (int i = 0; i < clase.getAtributos().size(); i++)
-			{
-				AtributoClase atributoActual = clase.getAtributos().get(i);
+			String cad = "function __construct";
+			String nombreAtributo2 = "";
+			
+			int interno = -1;
+			boolean primero = true;
+	    	for (int i = 0; i < clase.getAtributos().size(); i++)
+	    	{
 				String defecto = "\"\"";
-				String defectoPrev = atributoActual.getDefecto().replaceAll("\"", "");
+				String defectoPrev = clase.getAtributos().get(i).getDefecto().replaceAll("\"", "");
 				
 				if (defectoPrev.equals(""))
 				{
 					defecto = "\""+defectoPrev+"\"";
 				}
-				
-				if (i == 0)
-				{
-					primero = true;
-					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", "; 
-				}
-				else if (i % 3 == 0)
-				{
+
+	    		nombreAtributo2 = clase.getAtributos().get(i).getNombreNP();
+	    		
+	    		interno++;
+
+	    		if (interno == 0)
+	    		{
+	    			cad += "(";
+	    			cad += "$" + nombreAtributo2 + " = " + defecto + ", ";
+	    		}
+	    		else if (interno % 3 == 0)
+	    		{					
 					if (i == clase.getAtributos().size()-1)
 					{
-						cadAcumulada = cadAcumulada.substring(0, cadAcumulada.length()-2);
-						cadAcumulada += ")";
-					}
-					
-					if (primero)
-					{
-						primero = false;
-						imprimir(cadAcumulada, writer, espacioTabulador);
+						cad += "$" + nombreAtributo2 + " = " + defecto + ") ";
+						imprimir(cad, writer, espacioTabulador+5);
+						cad = "";
 					}
 					else
 					{
-						imprimir(cadAcumulada, writer, espacioTabulador+5);
-					}		
+						if (primero)
+						{
+							imprimir(cad, writer, espacioTabulador);
+						}
+						else
+						{
+							imprimir(cad, writer, espacioTabulador+5);
+						}
+
+						cad = "";
+						cad += "$" + nombreAtributo2 + " = " + defecto + ", ";
+					}
 					
-					cadAcumulada = "";
-					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", ";
-				}
-				else
-				{
-					cadAcumulada += "$" + atributoActual.getNombreNP() + " = " + defecto + ", ";
-				}
-			}
-			
-			if (!cadAcumulada.equals(""))
-			{
-				cadAcumulada = cadAcumulada.substring(0, cadAcumulada.length()-2);
-				
-				if (primero)
-				{
 					primero = false;
-					imprimir(cadAcumulada + ")", writer, espacioTabulador);
-				}
-				else
-				{
-					imprimir(cadAcumulada + ")", writer, espacioTabulador+5);
-				}					
-			}
-			
+	    		}
+	    		else
+	    		{
+	    			cad += "$" + nombreAtributo2 + " = " + defecto + ", ";
+	    		}
+	    	}
+	    	
+	    	if (!cad.equals(""))
+	    	{
+				cad = cad.substring(0, cad.length()-2);
+				cad += ")";
+				imprimir(cad, writer, espacioTabulador+5);
+				cad = "";
+	    	}
+	    				
 			imprimir ("{", writer, espacioTabulador);
 			
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				String cad = "$this->" + toCamelCase(clase.getAtributos().get(i).getNombreNP());
+				cad = "$this->" + toCamelCase(clase.getAtributos().get(i).getNombreNP());
 				int tam = getTamEspacios(clase.getAtributos().get(i).getNombreNP(), clase, true);
 				
 				for (int j = 0; j < tam; j++)
@@ -213,7 +216,7 @@ public class ExportadorPHP
 	        imprimir("{", writer, espacioTabulador+1);
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				String cad = "$array[\"" + clase.getAtributos().get(i).getNombre() + "\"]";
+				cad = "$array[\"" + clase.getAtributos().get(i).getNombre() + "\"]";
 				int tam = getTamEspacios(clase.getAtributos().get(i).getNombre(), clase, false);
 				
 				for (int j = 0; j < tam; j++)
@@ -243,7 +246,7 @@ public class ExportadorPHP
 			imprimir("{", writer, espacioTabulador+1);
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				String cad = "$this->" + toCamelCase("set_" + clase.getAtributos().get(i).getNombreNP()) + "(";
+				cad = "$this->" + toCamelCase("set_" + clase.getAtributos().get(i).getNombreNP()) + "(";
 				cad += "$array[\"" + clase.getAtributos().get(i).getNombre() + "\"]);";  
 				
 				imprimir(cad, writer, espacioTabulador+2);
@@ -354,10 +357,12 @@ public class ExportadorPHP
 	public static void exportarControlador(Clase clase)
 	{
 		String nombreClase = toCapitalCase(clase.getNombre());
-		String path = "code/Controlador" + nombreClase + ".php";
+		String path = "code/Controlers/Controlador" + nombreClase + ".php";
 		PrintWriter writer;
 		int espacioTabulador = 0;
 		String tabla = "TABLE_" + nombreClase.toUpperCase();
+		
+		System.out.println("Creando el controlador de la clase: " + clase);
 		
 		try 
 		{
@@ -368,7 +373,7 @@ public class ExportadorPHP
 			writer.println();
 			espacioTabulador++;
 			
-			imprimir("require_once(__DIR__.\"/" + nombreClase + ".php\");", writer, espacioTabulador);
+			imprimir("require_once(__DIR__.\"/../Classes/" + nombreClase + ".php\");", writer, espacioTabulador);
 			imprimir("require_once(__DIR__.\"/DatabaseManager.php\");", writer, espacioTabulador);
 			imprimir("", writer, espacioTabulador);
 		    imprimir("/**", writer, espacioTabulador);
@@ -631,13 +636,16 @@ public class ExportadorPHP
 	    		{					
 					if (i == clase.getAtributos().size()-1)
 					{
-						cad = cad.substring(0, cad.length()-2);
-						cad += ")";
+						cad += nombreAtributo + ")";
+						imprimir(cad, writer, espacioTabulador+5);
+						cad = "";
 					}
-					
-					imprimir(cad, writer, espacioTabulador+5);
-					cad = "";
-					cad += nombreAtributo + ", ";
+					else
+					{
+						imprimir(cad, writer, espacioTabulador+5);
+						cad = "";
+						cad += nombreAtributo + ", ";
+					}
 	    		}
 	    		else
 	    		{
@@ -680,13 +688,16 @@ public class ExportadorPHP
 	    		{    			
 					if (i == clase.getAtributos().size()-1)
 					{
-						cad = cad.substring(0, cad.length()-2);
-						cad += ")\";";
+		    			cad += "'$" + nombreAtributo + "')\";";
+						imprimir(cad, writer, espacioTabulador+5);
+						cad = "";
 					}
-					
-					imprimir(cad, writer, espacioTabulador+5);
-					cad = "";
-	    			cad += "'$" + nombreAtributo + "', ";
+					else
+					{
+						imprimir(cad, writer, espacioTabulador+5);
+						cad = "";
+		    			cad += "'$" + nombreAtributo + "', ";
+					}
 	    		}
 	    		else
 	    		{
