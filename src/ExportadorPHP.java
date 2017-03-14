@@ -406,10 +406,11 @@ public class ExportadorPHP
 		    imprimir("}", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
+		    imprimir("$" + nombreClase.toLowerCase() + "A = null;", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$" + nombreClase.toLowerCase() + "_simple  = DatabaseManager::singleFetchAssoc($query);" , writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
-		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== NULL)", writer, espacioTabulador+1);
+		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== null)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
 		    imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+2);
 		    imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+2);
@@ -432,8 +433,9 @@ public class ExportadorPHP
 		    imprimir("              ORDER BY $table" + nombreClase + "." + clase.getPrimaria().getNombre() + " DESC \";", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador);		    
 		    imprimir("$" + nombreClase.toLowerCase() + "_simple  = DatabaseManager::singleFetchAssoc($query);" , writer, espacioTabulador+1);
+		    imprimir("$" + nombreClase.toLowerCase() + "A = null;", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
-		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== NULL)", writer, espacioTabulador+1);
+		    imprimir("if ($" + nombreClase.toLowerCase() + "_simple !== null)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
 		    imprimir("$" + nombreClase.toLowerCase() + "A = new " + nombreClase + "();", writer, espacioTabulador+2);
 		    imprimir("$" + nombreClase.toLowerCase() + "A->fromArray($" + nombreClase.toLowerCase() + "_simple);", writer, espacioTabulador+2);
@@ -506,7 +508,7 @@ public class ExportadorPHP
 			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
 			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
 			imprimir("", writer, espacioTabulador);
-			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("if ($array" + nombreClase + "s !== null)", writer, espacioTabulador+1);
 			imprimir("{", writer, espacioTabulador+1);
 			imprimir("$i = 0;", writer, espacioTabulador+2);
 			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
@@ -526,7 +528,7 @@ public class ExportadorPHP
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("else", writer, espacioTabulador+1);
 	    	imprimir("{", writer, espacioTabulador+1);
-	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("return null;", writer, espacioTabulador+2);
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("}", writer, espacioTabulador);
 	        imprimir("", writer, espacioTabulador);
@@ -577,7 +579,7 @@ public class ExportadorPHP
 	    	imprimir("", writer, espacioTabulador);
 	    	imprimir("$single" + nombreClase + " = self::getSingle($opciones);", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador);
-		    imprimir("if ($single" + nombreClase + " == NULL || $single" + nombreClase + "->disimilitud($" + nombreClase.toLowerCase() + ") == 1)", writer, espacioTabulador+1);
+		    imprimir("if ($single" + nombreClase + " == null || $single" + nombreClase + "->disimilitud($" + nombreClase.toLowerCase() + ") == 1)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
 	    	
 	    	//Generamos las variables de insercion
@@ -738,7 +740,7 @@ public class ExportadorPHP
 	        imprimir("/**", writer, espacioTabulador);
 	        imprimir(" * Actualizar el Contenido de un objeto de tipo " + nombreClase.toLowerCase(), writer, espacioTabulador);
 	        imprimir(" */", writer, espacioTabulador);
-	        imprimir("static function update($" + nombreClase.toLowerCase() + " = NULL)", writer, espacioTabulador);
+	        imprimir("static function update($" + nombreClase.toLowerCase() + " = null)", writer, espacioTabulador);
 	        imprimir("{", writer, espacioTabulador);
 	        imprimir("if ($" + nombreClase.toLowerCase() + " === null)", writer, espacioTabulador+1);
 	        imprimir("{", writer, espacioTabulador+1);
@@ -812,7 +814,7 @@ public class ExportadorPHP
     		//Continuamos
     		imprimir("$single" + nombreClase + " = self::getSingle($opciones);", writer, espacioTabulador+2);
     		imprimir("", writer, espacioTabulador);
-    		imprimir("if ($single" + nombreClase + " == NULL || $single" + nombreClase + "->disimilitud($" + nombreClase.toLowerCase() + ") == 1)", writer, espacioTabulador+2);
+    		imprimir("if ($single" + nombreClase + " == null || $single" + nombreClase + "->disimilitud($" + nombreClase.toLowerCase() + ") == 1)", writer, espacioTabulador+2);
     		imprimir("{", writer, espacioTabulador+2);
 			imprimir("$table" + nombreClase + "  = DatabaseManager::getNameTable('" + tabla + "');", writer, espacioTabulador+3);
     		imprimir("", writer, espacioTabulador);
@@ -992,7 +994,7 @@ public class ExportadorPHP
 			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
 			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
 			imprimir("", writer, espacioTabulador);
-			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("if ($array" + nombreClase + "s !== null)", writer, espacioTabulador+1);
 			imprimir("{", writer, espacioTabulador+1);
 			imprimir("$i = 0;", writer, espacioTabulador+2);
 			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
@@ -1012,7 +1014,7 @@ public class ExportadorPHP
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("else", writer, espacioTabulador+1);
 	    	imprimir("{", writer, espacioTabulador+1);
-	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("return null;", writer, espacioTabulador+2);
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("}", writer, espacioTabulador);
 	        imprimir("", writer, espacioTabulador);
@@ -1134,7 +1136,7 @@ public class ExportadorPHP
 			imprimir("$array" + nombreClase + "s   = DatabaseManager::multiFetchAssoc($query);", writer, espacioTabulador+1);
 			imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
 			imprimir("", writer, espacioTabulador);
-			imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+			imprimir("if ($array" + nombreClase + "s !== null)", writer, espacioTabulador+1);
 			imprimir("{", writer, espacioTabulador+1);
 			imprimir("$i = 0;", writer, espacioTabulador+2);
 			imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple) ", writer, espacioTabulador+2);
@@ -1154,7 +1156,7 @@ public class ExportadorPHP
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("else", writer, espacioTabulador+1);
 	    	imprimir("{", writer, espacioTabulador+1);
-	    	imprimir("return NULL;", writer, espacioTabulador+2);
+	    	imprimir("return null;", writer, espacioTabulador+2);
 	    	imprimir("}", writer, espacioTabulador+1);
 	    	imprimir("}", writer, espacioTabulador);
 	        imprimir("", writer, espacioTabulador);
@@ -1209,7 +1211,7 @@ public class ExportadorPHP
 	        imprimir("$" + nombreClase.toLowerCase() + "_simples = array();", writer, espacioTabulador+1);
 	        imprimir("$return         = array();", writer, espacioTabulador+1);
 	        imprimir("", writer, espacioTabulador);
-	        imprimir("if ($array" + nombreClase + "s !== NULL)", writer, espacioTabulador+1);
+	        imprimir("if ($array" + nombreClase + "s !== null)", writer, espacioTabulador+1);
 	        imprimir("{", writer, espacioTabulador+1);
 	        imprimir("foreach ($array" + nombreClase + "s as $" + nombreClase.toLowerCase() + "_simple)", writer, espacioTabulador+2); 
 	        imprimir("{", writer, espacioTabulador+2);
