@@ -7,13 +7,51 @@ public class Clase
 	private LinkedList<AtributoClase> atributos;
 	private boolean relacion;
 	
+	private LinkedList<String> prefijos; 
+
 	Clase()
 	{
 		this.id = 0;
 		this.nombre = "";
 		this.atributos = new LinkedList<AtributoClase>();
 		this.relacion = false;
+		
+		this.prefijos = new LinkedList<String>();
+
+		this.prefijos.add("tcat_");
+		this.prefijos.add("trel_");
+		this.prefijos.add("t");
 	}
+
+	public String getNombreNP() 
+	{	
+		String nombreTemp = "";
+		String nombreAttr = this.nombre;
+		String nombrePrefijo = "";
+		
+		for (int i = 0; i < this.prefijos.size(); i++)
+		{
+			nombrePrefijo = this.prefijos.get(i);
+							
+			if (nombreAttr.length() > nombrePrefijo.length())
+			{
+				nombreTemp = nombreAttr.substring(0, nombrePrefijo.length());
+									
+				if (nombreTemp.equals(nombrePrefijo))
+				{
+					nombreTemp = nombreAttr.substring(nombreTemp.length());
+					return nombreTemp;
+				}
+			}
+			else
+			{
+				continue;
+			}
+		}
+				
+		return this.nombre;
+	}
+
 
 	public int getId() 
 	{
@@ -27,7 +65,7 @@ public class Clase
 
 	public String getNombre() 
 	{
-		return nombre;
+		return this.getNombreNP();
 	}
 
 	public void setNombre(String nombre) 

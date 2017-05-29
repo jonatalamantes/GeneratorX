@@ -68,6 +68,7 @@ public class AtributoClase
 		this.prefijos = new LinkedList<String>();
 		
 		this.prefijos.add("tcat_");
+		this.prefijos.add("trel_");
 		this.prefijos.add("t");
 	}
 
@@ -88,9 +89,11 @@ public class AtributoClase
 
 	public String getNombreNP() 
 	{
+		String nombreTemp = this.nombre;
+		
 		if (this.isForanea())
 		{
-			String nombreTemp = "";
+			nombreTemp = "";
 			String nombreAttr = this.nombre;
 			String nombrePrefijo = "";
 			
@@ -104,7 +107,7 @@ public class AtributoClase
 										
 					if (nombreTemp.equals(nombrePrefijo))
 					{
-						nombreTemp = nombreAttr.substring(nombreTemp.length()); 
+						nombreTemp = nombreAttr.substring(nombreTemp.length());
 						return nombreTemp;
 					}
 				}
@@ -114,7 +117,7 @@ public class AtributoClase
 				}
 			}
 		}
-
+				
 		return this.nombre;
 	}
 
