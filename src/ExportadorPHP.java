@@ -375,6 +375,7 @@ public class ExportadorPHP
 			
 			imprimir("require_once(__DIR__.\"/../Classes/" + nombreClase + ".php\");", writer, espacioTabulador);
 			imprimir("require_once(__DIR__.\"/DatabaseManager.php\");", writer, espacioTabulador);
+			imprimir("require_once(__DIR__.\"/WatashiEncrypt.php\");", writer, espacioTabulador);
 			imprimir("", writer, espacioTabulador);
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Clase para Manipular Objetos del Tipo " + nombreClase, writer, espacioTabulador);
@@ -592,7 +593,19 @@ public class ExportadorPHP
 	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
 	    			clase.getAtributos().get(i).isPrimaria())
 	    		{
-	    			continue;
+		    		if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+		    		{
+			    		cad = "$" + nombreAtributo;
+			    		tam = getTamEspacios(nombreAtributo, clase, false);
+			    		for (int j = 0; j < tam; j++)
+			    		{
+			    			cad += " ";
+			    		}
+			    		cad += " = WatashiEncrypt::uniqueKey();";
+			    		imprimir(cad, writer, espacioTabulador+2);
+		    		}
+		    		
+		    		continue;
 	    		}
 	    		
 	    		cad = "$" + nombreAtributo;
@@ -622,7 +635,14 @@ public class ExportadorPHP
 		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
 		    		clase.getAtributos().get(i).isPrimaria())
 	    		{
-	    			continue;
+	    			if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+	    			{
+	    				interno++;
+	    			}
+	    			else
+	    			{
+	    				continue;
+	    			}
 	    		}
 	    		else
 	    		{
@@ -671,11 +691,18 @@ public class ExportadorPHP
 	    		nombreAtributo = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
-		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
-		    		clase.getAtributos().get(i).isPrimaria())	    		
-	    		{
-	    			continue;
-	    		}
+			    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+			    		clase.getAtributos().get(i).isPrimaria())
+		    		{
+		    			if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+		    			{
+		    				interno++;
+		    			}
+		    			else
+		    			{
+		    				continue;
+		    			}
+		    		}
 	    		else
 	    		{
 	    			interno++;
