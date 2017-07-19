@@ -591,9 +591,10 @@ public class ExportadorPHP
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 	    			toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+	    			toCamelCase(nombreAtributo).toLowerCase().equals("uid") ||
 	    			clase.getAtributos().get(i).isPrimaria())
 	    		{
-		    		if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+		    		if (toCamelCase(nombreAtributo).toLowerCase().equals("uid"))
 		    		{
 			    		cad = "$" + nombreAtributo;
 			    		tam = getTamEspacios(nombreAtributo, clase, false);
@@ -633,9 +634,10 @@ public class ExportadorPHP
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
 		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+		    		toCamelCase(nombreAtributo).toLowerCase().equals("uid") ||
 		    		clase.getAtributos().get(i).isPrimaria())
 	    		{
-	    			if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+	    			if (toCamelCase(nombreAtributo).toLowerCase().equals("uid"))
 	    			{
 	    				interno++;
 	    			}
@@ -691,10 +693,11 @@ public class ExportadorPHP
 	    		nombreAtributo = clase.getAtributos().get(i).getNombreNP();
 	    		
 	    		if (nombreAtributo.toLowerCase().equals("activo") || 
-			    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
-			    		clase.getAtributos().get(i).isPrimaria())
+		    		toCamelCase(nombreAtributo).toLowerCase().equals("fecharegistro") ||
+		    		toCamelCase(nombreAtributo).toLowerCase().equals("uid") ||
+		    		clase.getAtributos().get(i).isPrimaria())
 		    		{
-		    			if (clase.getAtributos().get(i).isPrimaria() && clase.getAtributos().get(i).getTipo() == 1)
+		    			if (toCamelCase(nombreAtributo).toLowerCase().equals("uid"))
 		    			{
 		    				interno++;
 		    			}
