@@ -361,7 +361,7 @@ public class ExportadorPHP
 		PrintWriter writer;
 		int espacioTabulador = 0;
 		boolean existUid = false;
-		String tabla = "TABLE_" + nombreClase.toUpperCase();
+		String tabla = "TABLE_" + clase.getNombre().toUpperCase();
 		
 		System.out.println("Creando el controlador de la clase: " + clase);
 		
