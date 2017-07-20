@@ -360,6 +360,7 @@ public class ExportadorPHP
 		String path = "code/Controlers/Controlador" + nombreClase + ".php";
 		PrintWriter writer;
 		int espacioTabulador = 0;
+		boolean existUid = false;
 		String tabla = "TABLE_" + nombreClase.toUpperCase();
 		
 		System.out.println("Creando el controlador de la clase: " + clase);
@@ -376,6 +377,7 @@ public class ExportadorPHP
 			imprimir("require_once(__DIR__.\"/../Classes/" + nombreClase + ".php\");", writer, espacioTabulador);
 			imprimir("require_once(__DIR__.\"/DatabaseManager.php\");", writer, espacioTabulador);
 			imprimir("require_once(__DIR__.\"/WatashiEncrypt.php\");", writer, espacioTabulador);
+			imprimir("require_once(__DIR__.\"/ControladorLog.php\");", writer, espacioTabulador);
 			imprimir("", writer, espacioTabulador);
 		    imprimir("/**", writer, espacioTabulador);
 		    imprimir(" * Clase para Manipular Objetos del Tipo " + nombreClase, writer, espacioTabulador);
@@ -596,6 +598,7 @@ public class ExportadorPHP
 	    		{
 		    		if (toCamelCase(nombreAtributo).toLowerCase().equals("uid"))
 		    		{
+		    			existUid = true; 
 			    		cad = "$" + nombreAtributo;
 			    		tam = getTamEspacios(nombreAtributo, clase, false);
 			    		for (int j = 0; j < tam; j++)
@@ -749,7 +752,22 @@ public class ExportadorPHP
 	    	imprimir("", writer, espacioTabulador);
 	        imprimir("if (DatabaseManager::singleAffectedRow($query) === true)", writer, espacioTabulador+2);
 	        imprimir("{", writer, espacioTabulador+2);
-	        imprimir("return true;", writer, espacioTabulador+3);
+	        
+	        imprimir("$log = new Log();", writer, espacioTabulador+3);
+	        imprimir("$log->setQuery(addslashes($query));", writer, espacioTabulador+3);
+	        imprimir("$log->setTipo('A');", writer, espacioTabulador+3);
+	        imprimir("", writer, espacioTabulador+3);
+	        imprimir("ControladorLog::add($log);" , writer, espacioTabulador+3);
+	        
+	        if (existUid)
+	        {
+	        	imprimir("return $uid;", writer, espacioTabulador+3);
+	        }
+	        else
+	        {
+	        	imprimir("return true;", writer, espacioTabulador+3);
+	        }
+	        
 	        imprimir("}", writer, espacioTabulador+2);
 	        imprimir("else", writer, espacioTabulador+2);
 	        imprimir("{", writer, espacioTabulador+2);
@@ -922,6 +940,15 @@ public class ExportadorPHP
 	        imprimir("", writer, espacioTabulador);
 			imprimir("if (DatabaseManager::singleAffectedRow($query) === true)", writer, espacioTabulador+3);
 			imprimir("{", writer, espacioTabulador+3);
+			
+			//Creamos el controlador del Log	        
+	        imprimir("$log = new Log();", writer, espacioTabulador+4);
+	        imprimir("$log->setQuery(addslashes($query));", writer, espacioTabulador+4);
+	        imprimir("$log->setTipo('M');", writer, espacioTabulador+4);
+	        imprimir("", writer, espacioTabulador+4);
+	        imprimir("ControladorLog::add($log);" , writer, espacioTabulador+4);
+			
+	        //Retornos
 			imprimir("return true;", writer, espacioTabulador+4);
 			imprimir("}", writer, espacioTabulador+3);
 			imprimir("else", writer, espacioTabulador+3);
@@ -1066,7 +1093,16 @@ public class ExportadorPHP
 	        imprimir("", writer, espacioTabulador+2);
 	        imprimir("$query = \"UPDATE $table" + nombreClase, writer, espacioTabulador+2);
 	        imprimir("          SET activo = 'N' WHERE " + clase.getPrimaria().getNombreNP() + " = $" + clase.getPrimaria().getNombreNP() + "\";", writer, espacioTabulador+2);
+
+	        //Creamos el log
 	        imprimir("", writer, espacioTabulador);
+	        imprimir("$log = new Log();", writer, espacioTabulador+2);
+	        imprimir("$log->setQuery(addslashes($query));", writer, espacioTabulador+2);
+	        imprimir("$log->setTipo('E');", writer, espacioTabulador+2);
+	        imprimir("", writer, espacioTabulador);
+	        imprimir("ControladorLog::add($log);" , writer, espacioTabulador+2);
+	        
+	        //Retorno del valor
 	        imprimir("return DatabaseManager::singleAffectedRow($query);", writer, espacioTabulador+2);
 	        imprimir("}", writer, espacioTabulador+1);
 	        imprimir("}", writer, espacioTabulador);
