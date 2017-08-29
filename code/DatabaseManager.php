@@ -557,9 +557,9 @@
         static function createBackup()
         {            
             $nombreDB = constant('DATABASE');
-            $usuario  = 'root';
+            $usuario  = constant('USER')
             $host     = constant('HOST');
-            $clave    = 'rt3xp@n0';
+            $clave    = constant('PASSWORD')
             $tables   = '*';
             $path = __DIR__."/../".date('y-m-d').".sql";
 
