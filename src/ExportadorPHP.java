@@ -246,7 +246,7 @@ public class ExportadorPHP
 			imprimir("{", writer, espacioTabulador+1);
 			for (int i = 0; i < clase.getAtributos().size(); i++)
 			{
-				imprimir("if (array_key_exists(\"" + clase.getAtributos().get(i).getNombre() + "\", $array)", writer, espacioTabulador+2);
+				imprimir("if (array_key_exists(\"" + clase.getAtributos().get(i).getNombre() + "\", $array))", writer, espacioTabulador+2);
 				imprimir("{", writer, espacioTabulador+2);
 				imprimir("$this->" + toCamelCase("set_" + clase.getAtributos().get(i).getNombreNP()) + "($array[\"" + clase.getAtributos().get(i).getNombre() + "\"]);", writer, espacioTabulador+3);
 				imprimir("}", writer, espacioTabulador+2);
