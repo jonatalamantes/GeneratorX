@@ -407,7 +407,7 @@ public class ExportadorPHP
 		    imprimir("", writer, espacioTabulador);
 		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
 		    imprimir("              FROM $table" + nombreClase, writer, espacioTabulador+1);
-		    imprimir("              WHERE activo='S' \";", writer, espacioTabulador+1);
+		    imprimir("              WHERE $table" + nombreClase + ".activo='S'", writer, espacioTabulador+1);
 		    imprimir("              AND \";", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador);		    
 		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
@@ -416,6 +416,23 @@ public class ExportadorPHP
 		    imprimir("}", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$query = substr($query, 0, strlen($query)-4);", writer, espacioTabulador+1);
+
+	        int posicionPrimaria = -1;
+	        for (int i = 0; i < clase.getAtributos().size(); i++)
+	        {
+	        	if (clase.getAtributos().get(i).isPrimaria())
+	        	{
+	        		posicionPrimaria = i;
+	        		break;
+	        	}
+	        }
+
+		    if (posicionPrimaria != -1)
+	        {
+        		String nombreAtributo = clase.getAtributos().get(posicionPrimaria).getNombreNP();
+    			imprimir("$query = $query . \" ORDER BY $table" + nombreClase + "." + nombreAtributo + " DESC\";", writer, espacioTabulador+1);
+	        }
+		    
 		    imprimir("$" + nombreClase.toLowerCase() + "A = null;", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador+1);
 		    imprimir("$" + nombreClase.toLowerCase() + "_simple  = DatabaseManager::singleFetchAssoc($query);" , writer, espacioTabulador+1);
@@ -471,7 +488,7 @@ public class ExportadorPHP
 	        
 	        //Creanos los if else de los ordenamientos
 	        boolean primera = true;
-	        int posicionPrimaria = -1;
+	        posicionPrimaria = -1;
 	        for (int i = 0; i < clase.getAtributos().size(); i++)
 	        {
 	        	if (clase.getAtributos().get(i).isDisimil() && !clase.getAtributos().get(i).isPrimaria())
