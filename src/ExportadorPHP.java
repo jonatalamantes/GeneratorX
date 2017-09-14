@@ -407,7 +407,8 @@ public class ExportadorPHP
 		    imprimir("", writer, espacioTabulador);
 		    imprimir("$query     = \"SELECT $table" + nombreClase + ".*", writer, espacioTabulador+1);
 		    imprimir("              FROM $table" + nombreClase, writer, espacioTabulador+1);
-		    imprimir("              WHERE \";", writer, espacioTabulador+1);
+		    imprimir("              WHERE activo='S' \";", writer, espacioTabulador+1);
+		    imprimir("              AND \";", writer, espacioTabulador+1);
 		    imprimir("", writer, espacioTabulador);		    
 		    imprimir("foreach ($keysValues as $key => $value)", writer, espacioTabulador+1);
 		    imprimir("{", writer, espacioTabulador+1);
