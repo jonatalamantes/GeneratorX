@@ -99,6 +99,8 @@ public class ExportadorPHP
 			writer.println("<?php ");
 			writer.println();
 			espacioTabulador++;
+			imprimir("require_once(__DIR__.'/../ParserUtil.php');", writer, espacioTabulador);
+			imprimir("", writer, espacioTabulador);
 			imprimir("/**", writer, espacioTabulador);
 			imprimir("* Clase para el " + nombreClase, writer, espacioTabulador);
 			imprimir("*/", writer, espacioTabulador);
@@ -332,7 +334,28 @@ public class ExportadorPHP
             	imprimir(" */", writer, espacioTabulador);
             	imprimir("public function " + nombreGetter +"()", writer, espacioTabulador);
             	imprimir("{", writer, espacioTabulador);
-            	imprimir("return $this->" + nombre + ";", writer, espacioTabulador+1);
+            	
+            	if (clase.getAtributos().get(i).getTipo() == 0)
+            	{
+            		imprimir("return ParserUtil::parseInt($this->" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 1)
+            	{
+            		imprimir("return ParserUtil::parseString($this->" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 2)
+            	{
+            		imprimir("return ParserUtil::parseTime($this->" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 3)
+            	{
+            		imprimir("return ParserUtil::parseBool($this->" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 4)
+            	{
+            		imprimir("return ParserUtil::parseString($this->" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	
             	imprimir("}", writer, espacioTabulador);
             	imprimir("", writer, espacioTabulador);
             	imprimir("/**", writer, espacioTabulador);
@@ -340,7 +363,28 @@ public class ExportadorPHP
             	imprimir(" */", writer, espacioTabulador);
             	imprimir("public function " + nombreSetter + "($" + nombre + ")", writer, espacioTabulador);
             	imprimir("{", writer, espacioTabulador);
-            	imprimir("$this->" + nombre + " = $" + nombre + ";", writer, espacioTabulador+1);
+
+            	if (clase.getAtributos().get(i).getTipo() == 0)
+            	{
+            		imprimir("$this->" + nombre + " = ParserUtil::parseInt($" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 1)
+            	{
+            		imprimir("$this->" + nombre + " = ParserUtil::parseString($" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 2)
+            	{
+            		imprimir("$this->" + nombre + " = ParserUtil::parseTime($" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 3)
+            	{
+            		imprimir("$this->" + nombre + " = ParserUtil::parseBool($" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	else if (clase.getAtributos().get(i).getTipo() == 4)
+            	{
+            		imprimir("$this->" + nombre + " = ParserUtil::parseString($" + nombre + ");", writer, espacioTabulador+1);
+            	}
+            	
             	imprimir("}", writer, espacioTabulador);
             	imprimir("", writer, espacioTabulador);
             }
